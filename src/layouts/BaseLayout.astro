@@ -1,0 +1,112 @@
+---
+import "../styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+  ogImage?: string;
+}
+
+const {
+  title = "PlatcoX — Where Global Trade Gets Redefined",
+  description = "PlatcoX enables cross-border commerce with intelligent sourcing, strategy, and operational infrastructure for brands scaling globally.",
+  ogImage = "/og-default.png",
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const ogImageURL = new URL(ogImage, Astro.site);
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://www.platcox.com/#organization",
+      name: "PlatcoX",
+      url: "https://www.platcox.com",
+      logo: {
+        "@type": "ImageObject",
+        url: "https://www.platcox.com/logo.svg",
+      },
+      sameAs: ["https://www.linkedin.com/in/cemtunakan"],
+      contactPoint: {
+        "@type": "ContactPoint",
+        telephone: "+90-212-288-34-94",
+        email: "cem@platcox.com",
+        contactType: "sales",
+        availableLanguage: ["English", "Turkish"],
+      },
+    },
+    {
+      "@type": "LocalBusiness",
+      "@id": "https://www.platcox.com/#localbusiness",
+      name: "PlatcoX",
+      url: "https://www.platcox.com",
+      telephone: "+90-212-288-34-94",
+      email: "cem@platcox.com",
+      address: {
+        "@type": "PostalAddress",
+        streetAddress: "Kültür Mah, Nisbetiye Cad. Akmerkez No:54",
+        addressLocality: "Beşiktaş",
+        addressRegion: "İstanbul",
+        postalCode: "34349",
+        addressCountry: "TR",
+      },
+      geo: {
+        "@type": "GeoCoordinates",
+        latitude: 41.0784,
+        longitude: 29.0133,
+      },
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://www.platcox.com/#website",
+      url: "https://www.platcox.com",
+      name: "PlatcoX",
+      publisher: {
+        "@id": "https://www.platcox.com/#organization",
+      },
+    },
+  ],
+};
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href={canonicalURL} />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImageURL} />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageURL} />
+
+    <!-- Google Fonts: Inter 300,400,500,600 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

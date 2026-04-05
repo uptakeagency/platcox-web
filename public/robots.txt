@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://www.platcox.com/sitemap-index.xml
+
+# LLM-readable site description
+# See: https://www.platcox.com/llms.txt
