@@ -1,0 +1,49 @@
+---
+import MobileMenu from "./MobileMenu.tsx";
+
+const navLinks = [
+  { label: "About", href: "#about" },
+  { label: "Solutions", href: "#solutions" },
+  { label: "Sustainability", href: "#sustainability" },
+  { label: "News", href: "#news" },
+  { label: "Contact", href: "#contact" },
+];
+---
+
+<header id="site-header" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
+  <div class="container-content flex items-center justify-between py-5">
+    <a href="/" class="relative z-50">
+      <span class="text-xl font-semibold text-text">
+        platco<span class="text-accent">X</span>
+      </span>
+    </a>
+
+    <nav class="hidden items-center gap-8 lg:flex">
+      {navLinks.map((link) => (
+        <a href={link.href} class="text-sm text-muted transition-colors hover:text-text">
+          {link.label}
+        </a>
+      ))}
+      <a href="#contact" class="border border-text px-5 py-2 text-sm font-medium text-text transition-colors hover:bg-text hover:text-bg">
+        Get Started
+      </a>
+    </nav>
+
+    <div class="lg:hidden">
+      <MobileMenu client:media="(max-width: 1023px)" />
+    </div>
+  </div>
+</header>
+
+<script>
+  const header = document.getElementById("site-header");
+  if (header) {
+    window.addEventListener("scroll", () => {
+      if (window.scrollY > 80) {
+        header.classList.add("bg-surface/90", "backdrop-blur-md", "border-b", "border-border");
+      } else {
+        header.classList.remove("bg-surface/90", "backdrop-blur-md", "border-b", "border-border");
+      }
+    });
+  }
+</script>
