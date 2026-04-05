@@ -1,0 +1,59 @@
+---
+import ScrollReveal from "./ScrollReveal.tsx";
+import ContactForm from "./ContactForm.tsx";
+---
+
+<section id="contact" class="section-padding">
+  <div class="container-content">
+    <ScrollReveal client:visible animation="fade-up">
+      <p class="section-label">CONTACT</p>
+      <h2 class="text-3xl font-light tracking-tight md:text-5xl">
+        Let's start the conversation.
+      </h2>
+      <p class="mt-4 text-muted">
+        Your questions, ideas, or partnership inquiries — we're here to listen.
+      </p>
+    </ScrollReveal>
+
+    <div class="mt-20 grid gap-16 md:grid-cols-2">
+      <ScrollReveal client:visible animation="fade-up" delay={0.2}>
+        <ContactForm client:visible />
+      </ScrollReveal>
+
+      <ScrollReveal client:visible animation="fade-in" delay={0.3}>
+        <div class="space-y-8">
+          <div>
+            <p class="text-sm font-medium text-text">Address</p>
+            <p class="mt-2 text-muted">
+              Kültür Mah, Nisbetiye Cad. Akmerkez No:54<br />
+              Beşiktaş / İstanbul, Türkiye 34349
+            </p>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-text">Email</p>
+            <a href="mailto:cem@platcox.com" class="mt-2 block text-muted hover:text-text transition-colors">
+              cem@platcox.com
+            </a>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-text">Phone</p>
+            <a href="tel:+902122883494" class="mt-2 block text-muted hover:text-text transition-colors">
+              0212 288 34 94
+            </a>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-text">Social</p>
+            <a
+              href="https://www.linkedin.com/in/cemtunakan"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="mt-2 inline-block text-muted hover:text-text transition-colors"
+            >
+              LinkedIn →
+            </a>
+          </div>
+        </div>
+      </ScrollReveal>
+    </div>
+  </div>
+</section>
