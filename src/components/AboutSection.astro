@@ -21,7 +21,7 @@ const items = [
       {items.map((item, i) => (
         <ScrollReveal client:visible animation="fade-up" delay={i * 0.15}>
           <div class="flex items-start justify-between gap-8 border-t border-border py-10">
-            <p class="text-lg text-text md:text-xl">{item.text}</p>
+            <p class="text-lg text-foreground md:text-xl">{item.text}</p>
             <span class="section-number shrink-0">{item.num}</span>
           </div>
         </ScrollReveal>

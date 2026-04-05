@@ -8,7 +8,7 @@ export default {
         bg: "#FAFAFA",
         surface: "#FFFFFF",
         "surface-alt": "#F5F5F5",
-        text: "#1A1A1A",
+        foreground: "#1A1A1A",
         muted: "#999999",
         dark: "#1A1A2E",
         accent: "#22C55E",

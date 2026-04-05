@@ -21,7 +21,7 @@ export default function MobileMenu() {
       >
         <motion.span
           animate={isOpen ? { rotate: 45, y: 7 } : { rotate: 0, y: 0 }}
-          className="block h-[2px] w-6 bg-text"
+          className="block h-[2px] w-6 bg-foreground"
         />
         <motion.span
           animate={isOpen ? { opacity: 0 } : { opacity: 1 }}
@@ -29,7 +29,7 @@ export default function MobileMenu() {
         />
         <motion.span
           animate={isOpen ? { rotate: -45, y: -7 } : { rotate: 0, y: 0 }}
-          className="block h-[2px] w-6 bg-text"
+          className="block h-[2px] w-6 bg-foreground"
         />
       </button>
 
@@ -51,7 +51,7 @@ export default function MobileMenu() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 + i * 0.05 }}
-                  className="text-2xl font-light text-text transition-colors hover:text-accent"
+                  className="text-2xl font-light text-foreground transition-colors hover:text-accent"
                 >
                   {link.label}
                 </motion.a>
@@ -63,7 +63,7 @@ export default function MobileMenu() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5 }}
-              className="mt-12 border border-text px-8 py-3 text-sm font-medium text-text transition-colors hover:bg-text hover:text-bg"
+              className="mt-12 border border-foreground px-8 py-3 text-sm font-medium text-foreground transition-colors hover:bg-foreground hover:text-bg"
             >
               Get Started
             </motion.a>

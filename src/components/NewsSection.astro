@@ -27,7 +27,7 @@ const posts = (await getCollection("news"))
                 {post.data.date.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
               </span>
             </div>
-            <h3 class="mt-2 text-xl font-medium text-text group-hover:text-accent transition-colors">
+            <h3 class="mt-2 text-xl font-medium text-foreground group-hover:text-accent transition-colors">
               {post.data.title}
             </h3>
             <p class="mt-2 text-sm text-muted">{post.data.excerpt}</p>

@@ -13,18 +13,18 @@ const navLinks = [
 <header id="site-header" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
   <div class="container-content flex items-center justify-between py-5">
     <a href="/" class="relative z-50">
-      <span class="text-xl font-semibold text-text">
+      <span class="text-xl font-semibold text-foreground">
         platco<span class="text-accent">X</span>
       </span>
     </a>
 
     <nav class="hidden items-center gap-8 lg:flex">
       {navLinks.map((link) => (
-        <a href={link.href} class="text-sm text-muted transition-colors hover:text-text">
+        <a href={link.href} class="text-sm text-muted transition-colors hover:text-foreground">
           {link.label}
         </a>
       ))}
-      <a href="#contact" class="border border-text px-5 py-2 text-sm font-medium text-text transition-colors hover:bg-text hover:text-bg">
+      <a href="#contact" class="border border-foreground px-5 py-2 text-sm font-medium text-foreground transition-colors hover:bg-foreground hover:text-bg">
         Get Started
       </a>
     </nav>
