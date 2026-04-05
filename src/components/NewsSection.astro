@@ -1,0 +1,39 @@
+---
+import { getCollection } from "astro:content";
+import ScrollReveal from "./ScrollReveal.tsx";
+
+const posts = (await getCollection("news"))
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+  .slice(0, 4);
+---
+
+<section id="news" class="section-padding">
+  <div class="container-content">
+    <ScrollReveal client:visible animation="fade-up">
+      <p class="section-label">NEWS</p>
+      <h2 class="text-3xl font-light tracking-tight md:text-5xl">Latest from PlatcoX</h2>
+    </ScrollReveal>
+
+    <div class="mt-20 grid gap-8 md:grid-cols-2">
+      {posts.map((post, i) => (
+        <ScrollReveal client:visible animation="fade-up" delay={i * 0.15}>
+          <a href={`/news/${post.id}`} class="group block border-t border-border pt-6">
+            <div class="aspect-video bg-surface-alt mb-4"></div>
+            <div class="flex items-center gap-3">
+              <span class="text-[11px] font-medium uppercase tracking-[2px] text-muted">
+                {post.data.category}
+              </span>
+              <span class="text-xs text-muted">
+                {post.data.date.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+              </span>
+            </div>
+            <h3 class="mt-2 text-xl font-medium text-text group-hover:text-accent transition-colors">
+              {post.data.title}
+            </h3>
+            <p class="mt-2 text-sm text-muted">{post.data.excerpt}</p>
+          </a>
+        </ScrollReveal>
+      ))}
+    </div>
+  </div>
+</section>

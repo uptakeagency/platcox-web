@@ -1,0 +1,35 @@
+---
+import { getCollection, render } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/Header.astro";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("news");
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+---
+
+<BaseLayout title={`${post.data.title} — PlatcoX`} description={post.data.excerpt}>
+  <Header />
+  <main class="section-padding pt-32">
+    <article class="container-content max-w-3xl">
+      <a href="/#news" class="text-sm text-muted hover:text-accent transition-colors">&larr; Back to News</a>
+      <div class="mt-6 flex items-center gap-3">
+        <span class="text-[11px] font-medium uppercase tracking-[2px] text-muted">{post.data.category}</span>
+        <span class="text-xs text-muted">
+          {post.data.date.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+        </span>
+      </div>
+      <h1 class="mt-4 text-3xl font-light tracking-tight md:text-5xl">{post.data.title}</h1>
+      <div class="prose mt-12 max-w-none text-text">
+        <Content />
+      </div>
+    </article>
+  </main>
+</BaseLayout>
