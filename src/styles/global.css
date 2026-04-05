@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-bg text-text font-sans antialiased;
+  }
+}
+
+@layer components {
+  .section-padding {
+    @apply py-24 px-6 md:py-[200px] md:px-8;
+  }
+
+  .section-label {
+    @apply text-[11px] font-medium uppercase tracking-[3px] text-muted mb-4;
+  }
+
+  .section-number {
+    @apply text-xs text-muted;
+  }
+
+  .container-content {
+    @apply max-w-[1100px] mx-auto;
+  }
+
+  .section-divider {
+    @apply border-t border-border;
+  }
+}
