@@ -1,9 +1,34 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import HeroSection from "../components/HeroSection.astro";
+import AboutSection from "../components/AboutSection.astro";
+import PhilosophySection from "../components/PhilosophySection.astro";
+import SolutionsSection from "../components/SolutionsSection.astro";
+import ClientsWhySection from "../components/ClientsWhySection.astro";
+import SustainabilitySection from "../components/SustainabilitySection.astro";
+import TestimonialsSection from "../components/TestimonialsSection.astro";
+import NewsSection from "../components/NewsSection.astro";
+import ContactSection from "../components/ContactSection.astro";
+import LocationsSection from "../components/LocationsSection.astro";
+import DualCTA from "../components/DualCTA.astro";
+import Footer from "../components/Footer.astro";
 ---
 
 <BaseLayout>
+  <Header />
   <main>
-    <p>PlatcoX — Coming Soon</p>
+    <HeroSection />
+    <AboutSection />
+    <PhilosophySection />
+    <SolutionsSection />
+    <ClientsWhySection />
+    <SustainabilitySection />
+    <TestimonialsSection />
+    <NewsSection />
+    <ContactSection />
+    <LocationsSection />
+    <DualCTA />
   </main>
+  <Footer />
 </BaseLayout>
