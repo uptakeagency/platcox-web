@@ -1,0 +1,40 @@
+---
+import ScrollReveal from "./ScrollReveal.tsx";
+
+const solutions = [
+  { num: "/01", title: "Idea Factories", description: "Creative churns & birth of concepts and ideas" },
+  { num: "/02", title: "Design Centres", description: "Bringing art and science together" },
+  { num: "/03", title: "Product Development", description: "Transforming ideas and concepts into products" },
+  { num: "/04", title: "Manufacturing Centres", description: "Threading together designs into products" },
+  { num: "/05", title: "Showrooms", description: "Bringing alive the look & feel" },
+];
+---
+
+<section id="solutions" class="section-padding">
+  <div class="container-content">
+    <ScrollReveal client:visible animation="fade-up">
+      <p class="section-label">OUR SOLUTIONS</p>
+      <h2 class="text-3xl font-light tracking-tight md:text-5xl">
+        Engineered to scale vision with precision.
+      </h2>
+      <p class="mt-6 max-w-2xl text-muted">
+        Our solutions are built around intelligent sourcing, product development, cross-border
+        operational infrastructure, and market access — enabling scalable international growth.
+      </p>
+    </ScrollReveal>
+
+    <div class="mt-20">
+      {solutions.map((s, i) => (
+        <ScrollReveal client:visible animation="fade-up" delay={i * 0.1}>
+          <div class="flex items-start justify-between gap-8 border-t border-border py-8">
+            <div>
+              <h3 class="text-xl font-medium text-text">{s.title}</h3>
+              <p class="mt-1 text-muted">{s.description}</p>
+            </div>
+            <span class="section-number shrink-0">{s.num}</span>
+          </div>
+        </ScrollReveal>
+      ))}
+    </div>
+  </div>
+</section>

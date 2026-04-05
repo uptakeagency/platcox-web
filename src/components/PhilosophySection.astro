@@ -1,0 +1,31 @@
+---
+import ScrollReveal from "./ScrollReveal.tsx";
+
+const principles = [
+  { title: "DISCIPLINE", description: "Precision logistics and operations, executed quietly." },
+  { title: "ACCESS", description: "Trusted global networks that don't advertise themselves." },
+  { title: "DESIGN THINKING", description: "Scalable commerce solutions crafted like timeless style." },
+];
+---
+
+<section id="philosophy" class="section-padding">
+  <div class="container-content">
+    <ScrollReveal client:visible animation="fade-up">
+      <p class="section-label">OUR PHILOSOPHY</p>
+      <h2 class="text-3xl font-light tracking-tight md:text-5xl">
+        Principles that move markets.
+      </h2>
+    </ScrollReveal>
+
+    <div class="mt-20 grid gap-4 md:grid-cols-3">
+      {principles.map((p, i) => (
+        <ScrollReveal client:visible animation="fade-up" delay={i * 0.1}>
+          <div class="bg-surface-alt p-8">
+            <p class="text-[11px] font-medium uppercase tracking-[2px] text-muted">{p.title}</p>
+            <p class="mt-4 text-text">{p.description}</p>
+          </div>
+        </ScrollReveal>
+      ))}
+    </div>
+  </div>
+</section>

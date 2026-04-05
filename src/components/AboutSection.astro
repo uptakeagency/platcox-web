@@ -1,0 +1,31 @@
+---
+import ScrollReveal from "./ScrollReveal.tsx";
+
+const items = [
+  { num: "/0.1", text: "Every operation is meticulously organized — strategy isn't an afterthought." },
+  { num: "/0.2", text: "We turn data into direction — foresight drives every move we make." },
+  { num: "/0.3", text: "From concept to commerce — we carry brands across borders, seamlessly." },
+];
+---
+
+<section id="about" class="section-padding">
+  <div class="container-content">
+    <ScrollReveal client:visible animation="fade-up">
+      <h2 class="text-4xl font-light leading-tight tracking-tight md:text-5xl lg:text-6xl">
+        Our solutions power real-time, cross-border commerce
+        <span class="text-muted"> from the sourcing floor to the storefront</span>
+      </h2>
+    </ScrollReveal>
+
+    <div class="mt-24">
+      {items.map((item, i) => (
+        <ScrollReveal client:visible animation="fade-up" delay={i * 0.15}>
+          <div class="flex items-start justify-between gap-8 border-t border-border py-10">
+            <p class="text-lg text-text md:text-xl">{item.text}</p>
+            <span class="section-number shrink-0">{item.num}</span>
+          </div>
+        </ScrollReveal>
+      ))}
+    </div>
+  </div>
+</section>
