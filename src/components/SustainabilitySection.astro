@@ -1,0 +1,57 @@
+---
+import ScrollReveal from "./ScrollReveal.tsx";
+
+const pillars = [
+  { num: "01", title: "Systemic Efficiency", description: "Sustainability is embedded into workflows — not treated as a campaign layer. We optimize for output, clarity, and operational discipline." },
+  { num: "02", title: "Circular Commerce Enablement", description: "We build systems that enable reuse, recovery, and smarter distribution — making circular economy practical at scale." },
+  { num: "03", title: "Responsible Scale", description: "Growth should not multiply waste. We design for repeatability, governance, and controlled expansion." },
+];
+---
+
+<section id="sustainability" class="bg-dark py-24 md:py-[200px] px-6 md:px-8">
+  <div class="container-content">
+    <ScrollReveal client:visible animation="fade-up">
+      <p class="text-[11px] font-medium uppercase tracking-[3px] text-accent mb-4">SUSTAINABILITY BY DESIGN</p>
+      <h2 class="text-3xl font-light tracking-tight text-white md:text-5xl">
+        Not a statement. An operating system.
+      </h2>
+    </ScrollReveal>
+
+    <ScrollReveal client:visible animation="fade-in" delay={0.2}>
+      <div class="mt-16 aspect-video overflow-hidden bg-white/5">
+        <iframe
+          src="https://www.youtube-nocookie.com/embed/VIDEO_ID"
+          title="PlatcoX Sustainability"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+          loading="lazy"
+          class="h-full w-full"
+        ></iframe>
+      </div>
+    </ScrollReveal>
+
+    <ScrollReveal client:visible animation="fade-up" delay={0.3}>
+      <blockquote class="mt-16 border-l-2 border-accent pl-6 text-xl italic text-white/60">
+        "Sustainability is not a promise. It is a system."
+      </blockquote>
+    </ScrollReveal>
+
+    <div class="mt-20 grid gap-4 md:grid-cols-3">
+      {pillars.map((p, i) => (
+        <ScrollReveal client:visible animation="fade-up" delay={0.1 + i * 0.15}>
+          <div class="bg-white/5 p-8">
+            <span class="text-sm font-medium text-accent">{p.num}</span>
+            <h3 class="mt-2 text-xl font-medium text-white">{p.title}</h3>
+            <p class="mt-3 text-sm text-white/60">{p.description}</p>
+          </div>
+        </ScrollReveal>
+      ))}
+    </div>
+
+    <ScrollReveal client:visible animation="fade-in" delay={0.3}>
+      <p class="mt-16 text-center text-white/40">
+        We do not claim to save the world. We design systems that make global commerce more responsible by default.
+      </p>
+    </ScrollReveal>
+  </div>
+</section>

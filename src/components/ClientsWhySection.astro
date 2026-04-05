@@ -1,0 +1,73 @@
+---
+import ScrollReveal from "./ScrollReveal.tsx";
+
+const clients = [
+  "Brands ready to operate beyond borders",
+  "Retailers scaling without operational friction",
+  "Innovators who prefer strategy over noise",
+  "Visionaries who design the future of commerce",
+];
+
+const reasons = [
+  "Trusted by those who don't follow the crowd",
+  "Global by nature, structured by design",
+  "Fast-moving, disciplined, and confidential",
+];
+---
+
+<section id="clients" class="section-padding">
+  <div class="container-content">
+    <div class="grid gap-16 md:grid-cols-2 md:items-center">
+      <ScrollReveal client:visible animation="slide-left">
+        <div class="aspect-[4/3] bg-surface-alt"></div>
+      </ScrollReveal>
+
+      <ScrollReveal client:visible animation="slide-right">
+        <div>
+          <h2 class="text-3xl font-light tracking-tight md:text-5xl">
+            There is so much left to build
+          </h2>
+          <p class="mt-6 text-muted">
+            PlatcoX enables brands, retailers, and visionaries to operate beyond borders
+            with precision infrastructure and trusted global networks.
+          </p>
+          <a href="#contact" class="mt-6 inline-block text-sm font-medium text-text underline underline-offset-4 hover:text-accent">
+            Learn More →
+          </a>
+        </div>
+      </ScrollReveal>
+    </div>
+
+    <div class="mt-32 border-t border-border pt-20">
+      <ScrollReveal client:visible animation="fade-up">
+        <h2 class="text-3xl font-light tracking-tight md:text-4xl">
+          Because real influence happens off-stage.
+        </h2>
+      </ScrollReveal>
+
+      <div class="mt-12 grid gap-12 md:grid-cols-2">
+        <ScrollReveal client:visible animation="fade-up" delay={0.1}>
+          <div>
+            <p class="section-label">WHO WE WORK WITH</p>
+            <ul class="mt-4 space-y-3">
+              {clients.map((c) => (
+                <li class="text-muted">{c}</li>
+              ))}
+            </ul>
+          </div>
+        </ScrollReveal>
+
+        <ScrollReveal client:visible animation="fade-up" delay={0.2}>
+          <div>
+            <p class="section-label">WHY PLATCOX</p>
+            <ul class="mt-4 space-y-3">
+              {reasons.map((r) => (
+                <li class="text-muted">{r}</li>
+              ))}
+            </ul>
+          </div>
+        </ScrollReveal>
+      </div>
+    </div>
+  </div>
+</section>

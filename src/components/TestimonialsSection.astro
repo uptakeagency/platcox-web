@@ -1,0 +1,15 @@
+---
+import ScrollReveal from "./ScrollReveal.tsx";
+import TestimonialsCarousel from "./TestimonialsCarousel.tsx";
+---
+
+<section class="section-padding">
+  <div class="container-content">
+    <ScrollReveal client:visible animation="fade-up">
+      <p class="section-label">WHAT THEY SAY</p>
+    </ScrollReveal>
+  </div>
+  <div class="container-content">
+    <TestimonialsCarousel client:visible />
+  </div>
+</section>
