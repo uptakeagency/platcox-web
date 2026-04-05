@@ -19,14 +19,15 @@ const pillars = [
 
     <ScrollReveal client:visible animation="fade-in" delay={0.2}>
       <div class="mt-16 aspect-video overflow-hidden bg-white/5">
-        <iframe
-          src="https://www.youtube-nocookie.com/embed/VIDEO_ID"
-          title="PlatcoX Sustainability"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowfullscreen
-          loading="lazy"
-          class="h-full w-full"
-        ></iframe>
+        <video
+          autoplay
+          muted
+          loop
+          playsinline
+          class="h-full w-full object-cover"
+        >
+          <source src="/videos/sustainability.mp4" type="video/mp4" />
+        </video>
       </div>
     </ScrollReveal>
 

@@ -19,7 +19,17 @@ const reasons = [
   <div class="container-content">
     <div class="grid gap-16 md:grid-cols-2 md:items-center">
       <ScrollReveal client:visible animation="slide-left">
-        <div class="aspect-[4/3] bg-surface-alt"></div>
+        <div class="aspect-[4/3] overflow-hidden bg-surface-alt">
+          <video
+            autoplay
+            muted
+            loop
+            playsinline
+            class="h-full w-full object-cover"
+          >
+            <source src="/videos/business.mp4" type="video/mp4" />
+          </video>
+        </div>
       </ScrollReveal>
 
       <ScrollReveal client:visible animation="slide-right">
