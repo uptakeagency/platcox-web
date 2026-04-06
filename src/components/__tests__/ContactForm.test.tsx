@@ -47,12 +47,12 @@ describe("ContactForm", () => {
     expect(name.className).toContain("bg-transparent");
   });
 
-  it("submit button has dark background (#1A1A1A), not green", () => {
+  it("submit button uses foreground (dark) background, not accent green", () => {
     render(<ContactForm />);
 
     const button = screen.getByRole("button", { name: "Send Message" });
-    expect(button.className).toContain("bg-[#1A1A1A]");
-    expect(button.className).toContain("text-white");
-    expect(button.className).not.toContain("bg-[#22C55E]");
+    expect(button.className).toContain("bg-foreground");
+    expect(button.className).toContain("text-bg");
+    expect(button.className).not.toContain("bg-accent");
   });
 });

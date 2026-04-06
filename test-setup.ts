@@ -1,8 +1,14 @@
 import { JSDOM } from "jsdom";
+import { afterEach } from "bun:test";
 
 const dom = new JSDOM("<!DOCTYPE html><html><body></body></html>", {
   url: "http://localhost",
   pretendToBeVisual: true,
+});
+
+// Clear body between tests so duplicate-element queries don't bleed across tests
+afterEach(() => {
+  dom.window.document.body.innerHTML = "";
 });
 
 Object.assign(globalThis, {

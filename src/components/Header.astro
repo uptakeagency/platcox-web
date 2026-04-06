@@ -45,12 +45,16 @@ const navLinks = [
 <script>
   const header = document.getElementById("site-header");
   if (header) {
-    window.addEventListener("scroll", () => {
-      if (window.scrollY > 80) {
-        header.classList.add("bg-surface/90", "backdrop-blur-md", "border-b", "border-border");
-      } else {
-        header.classList.remove("bg-surface/90", "backdrop-blur-md", "border-b", "border-border");
-      }
-    });
+    window.addEventListener(
+      "scroll",
+      () => {
+        if (window.scrollY > 80) {
+          header.classList.add("bg-surface/90", "backdrop-blur-md", "border-b", "border-border");
+        } else {
+          header.classList.remove("bg-surface/90", "backdrop-blur-md", "border-b", "border-border");
+        }
+      },
+      { passive: true },
+    );
   }
 </script>

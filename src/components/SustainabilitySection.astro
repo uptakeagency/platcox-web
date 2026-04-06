@@ -1,5 +1,6 @@
 ---
 import ScrollReveal from "./ScrollReveal.tsx";
+import LazyVideo from "./LazyVideo.astro";
 
 const pillars = [
   { num: "01", title: "Systemic Efficiency", description: "Sustainability is embedded into workflows — not treated as a campaign layer. We optimize for output, clarity, and operational discipline." },
@@ -19,15 +20,7 @@ const pillars = [
 
     <ScrollReveal client:visible animation="fade-in" delay={0.2}>
       <div class="mt-16 aspect-video overflow-hidden bg-white/5">
-        <video
-          autoplay
-          muted
-          loop
-          playsinline
-          class="h-full w-full object-cover"
-        >
-          <source src="/videos/sustainability.mp4" type="video/mp4" />
-        </video>
+        <LazyVideo src="/videos/sustainability.mp4" class="h-full w-full object-cover" />
       </div>
     </ScrollReveal>
 
