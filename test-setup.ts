@@ -15,6 +15,7 @@ Object.assign(globalThis, {
   window: dom.window,
   document: dom.window.document,
   navigator: dom.window.navigator,
+  Window: dom.window.Window,
   HTMLElement: dom.window.HTMLElement,
   HTMLDivElement: dom.window.HTMLDivElement,
   Element: dom.window.Element,
@@ -28,6 +29,12 @@ Object.assign(globalThis, {
   cancelAnimationFrame: dom.window.cancelAnimationFrame,
   IntersectionObserver: class IntersectionObserver {
     constructor(_cb: any, _opts?: any) {}
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  },
+  ResizeObserver: class ResizeObserver {
+    constructor(_cb: any) {}
     observe() {}
     unobserve() {}
     disconnect() {}

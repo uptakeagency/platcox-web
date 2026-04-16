@@ -1,4 +1,4 @@
-import { useEffect, useRef, type MutableRefObject } from "react";
+import { useEffect, useRef, type RefObject } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { getLenis } from "../../lib/lenisSingleton";
@@ -12,13 +12,16 @@ export interface UseScrollProgressOptions {
   mobileQuery?: string;       // default: "(max-width: 767px)"
 }
 
-export function useScrollProgress(opts: UseScrollProgressOptions): MutableRefObject<number> {
+export function useScrollProgress(opts: UseScrollProgressOptions): RefObject<number> {
   const progress = useRef(0);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     const el = document.querySelector(opts.triggerSelector);
-    if (!el) return;
+    if (!el) {
+      console.warn(`[useScrollProgress] Trigger element not found: ${opts.triggerSelector}`);
+      return;
+    }
 
     const mq = window.matchMedia(opts.mobileQuery ?? "(max-width: 767px)");
     const end = mq.matches ? opts.pinDistanceMobile : opts.pinDistanceDesktop;
@@ -39,7 +42,7 @@ export function useScrollProgress(opts: UseScrollProgressOptions): MutableRefObj
     });
 
     return () => {
-      st.kill();
+      st.kill(true); // true = also remove pin spacer
       lenis?.off("scroll", onLenisScroll);
     };
   }, [opts.triggerSelector, opts.pinDistanceDesktop, opts.pinDistanceMobile, opts.mobileQuery]);
