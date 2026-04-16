@@ -1,6 +1,10 @@
 # Cinematic Showcase Assets
 
-These are placeholders. Before merging to `main`, replace with final AI-generated assets.
+Final AI-generated assets (Gemini Nano Banana Pro — `gemini-3-pro-image-preview`).
+Regenerate with `GEMINI_API_KEY=... bun scripts/generate-cinematic-images.ts`.
+
+`noise.webp` is a hand-generated Perlin-style texture — replace only if a new
+authored noise is preferred.
 
 ## Contract
 
