@@ -3,6 +3,18 @@ import Lenis from "lenis";
 let instance: Lenis | null = null;
 let rafId: number | null = null;
 
+/**
+ * Returns the app-wide Lenis instance (lazy-initialized on first call).
+ *
+ * IMPORTANT — reduced-motion contract:
+ * This function does NOT check `prefers-reduced-motion`. Callers who want to
+ * respect that preference must guard their call site. See `useScrollProgress`
+ * for the pattern: pass `disabled: true` when reduced-motion is active so the
+ * hook never calls `getLenis`, and native scroll behavior is preserved.
+ *
+ * Calling getLenis() unconditionally takes over the page's scroll behavior
+ * for all users, including those who have requested reduced motion.
+ */
 export function getLenis(): Lenis | null {
   if (typeof window === "undefined") return null;
   if (instance) return instance;

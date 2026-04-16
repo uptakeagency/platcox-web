@@ -27,7 +27,6 @@ export function useScrollProgress(opts: UseScrollProgressOptions): RefObject<num
     }
 
     const mq = window.matchMedia(opts.mobileQuery ?? "(max-width: 767px)");
-    const end = mq.matches ? opts.pinDistanceMobile : opts.pinDistanceDesktop;
 
     const lenis = getLenis();
     const onLenisScroll = () => ScrollTrigger.update();
@@ -36,7 +35,7 @@ export function useScrollProgress(opts: UseScrollProgressOptions): RefObject<num
     const st = ScrollTrigger.create({
       trigger: el,
       start: "top top",
-      end,
+      end: () => (mq.matches ? opts.pinDistanceMobile : opts.pinDistanceDesktop),
       pin: true,
       scrub: 1,
       onUpdate: (self) => {
@@ -44,9 +43,13 @@ export function useScrollProgress(opts: UseScrollProgressOptions): RefObject<num
       },
     });
 
+    const onBreakpointChange = () => ScrollTrigger.refresh();
+    mq.addEventListener("change", onBreakpointChange);
+
     return () => {
       st.kill(true); // true = also remove pin spacer
       lenis?.off("scroll", onLenisScroll);
+      mq.removeEventListener("change", onBreakpointChange);
     };
   }, [opts.triggerSelector, opts.pinDistanceDesktop, opts.pinDistanceMobile, opts.mobileQuery, opts.disabled]);
 

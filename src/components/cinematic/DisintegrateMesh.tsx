@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useRef, type RefObject } from "react";
+import { useEffect, useMemo, type RefObject } from "react";
 import { useFrame, useLoader, useThree } from "@react-three/fiber";
-import { TextureLoader, ShaderMaterial, type Mesh } from "three";
+import { TextureLoader, ShaderMaterial } from "three";
 import { vertex, fragment } from "./DisintegrateShader";
 
 interface DisintegrateMeshProps {
@@ -18,7 +18,6 @@ export default function DisintegrateMesh({
   noise,
   segments = 64,
 }: DisintegrateMeshProps) {
-  const meshRef = useRef<Mesh>(null);
   const viewport = useThree((s) => s.viewport);
 
   const [texA, texB, texNoise] = useLoader(TextureLoader, [imageA, imageB, noise]);
@@ -51,7 +50,7 @@ export default function DisintegrateMesh({
   });
 
   return (
-    <mesh ref={meshRef}>
+    <mesh>
       <planeGeometry args={[viewport.width, viewport.height, segments, segments]} />
       <primitive object={material} attach="material" />
     </mesh>
