@@ -27,7 +27,7 @@ import ShowcaseCanvas from "./cinematic/ShowcaseCanvas.tsx";
   // Reveal the manifesto when the section has scrolled past ~85% of its pin distance.
   // Lightweight; does not depend on GSAP (avoids double-animating from the canvas side).
   const section = document.getElementById("cinematic-showcase");
-  const manifesto = document.querySelector<HTMLElement>("[data-manifesto]");
+  const manifesto = section?.querySelector<HTMLElement>("[data-manifesto]") ?? null;
   if (section && manifesto) {
     const onScroll = () => {
       const rect = section.getBoundingClientRect();
