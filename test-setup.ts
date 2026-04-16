@@ -40,3 +40,17 @@ Object.assign(globalThis, {
     disconnect() {}
   },
 });
+
+// Default matchMedia stub so libraries that touch it at module-load time
+// (e.g. GSAP ScrollTrigger via registerPlugin) don't crash under jsdom.
+// Individual tests may override window.matchMedia.
+(dom.window as any).matchMedia = (q: string) => ({
+  matches: false,
+  media: q,
+  onchange: null,
+  addEventListener: () => {},
+  removeEventListener: () => {},
+  addListener: () => {},
+  removeListener: () => {},
+  dispatchEvent: () => false,
+});
