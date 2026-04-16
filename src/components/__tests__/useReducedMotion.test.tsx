@@ -4,16 +4,29 @@ import { useReducedMotion } from "../cinematic/useReducedMotion";
 
 function mockMatchMedia(matches: boolean) {
   const listeners: Array<(e: { matches: boolean }) => void> = [];
+  let removedCount = 0;
   (window as any).matchMedia = (_: string) => ({
     matches,
     media: "(prefers-reduced-motion: reduce)",
-    addEventListener: (_ev: string, cb: (e: { matches: boolean }) => void) => listeners.push(cb),
-    removeEventListener: () => {},
+    addEventListener: (ev: string, cb: (e: { matches: boolean }) => void) => {
+      if (ev !== "change") throw new Error(`Unexpected event: ${ev}`);
+      listeners.push(cb);
+    },
+    removeEventListener: (ev: string, cb: (e: { matches: boolean }) => void) => {
+      if (ev !== "change") throw new Error(`Unexpected event: ${ev}`);
+      const i = listeners.indexOf(cb);
+      if (i >= 0) {
+        listeners.splice(i, 1);
+        removedCount++;
+      }
+    },
     onchange: null,
     dispatchEvent: () => false,
   });
   return {
     trigger: (v: boolean) => listeners.forEach((l) => l({ matches: v })),
+    getListenerCount: () => listeners.length,
+    getRemovedCount: () => removedCount,
   };
 }
 
@@ -36,5 +49,14 @@ describe("useReducedMotion", () => {
     expect(result.current).toBe(false);
     act(() => mm.trigger(true));
     expect(result.current).toBe(true);
+  });
+
+  it("removes the change listener on unmount", () => {
+    const mm = mockMatchMedia(false);
+    const { unmount } = renderHook(() => useReducedMotion());
+    expect(mm.getListenerCount()).toBe(1);
+    unmount();
+    expect(mm.getListenerCount()).toBe(0);
+    expect(mm.getRemovedCount()).toBe(1);
   });
 });

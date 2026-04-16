@@ -12,6 +12,7 @@ export function useReducedMotion(): boolean {
     const handler = (e: MediaQueryListEvent | { matches: boolean }) =>
       setReduced(e.matches);
     mq.addEventListener("change", handler as (e: MediaQueryListEvent) => void);
+    // Re-sync after subscribing in case the media query changed between render and effect commit.
     setReduced(mq.matches);
     return () => mq.removeEventListener("change", handler as (e: MediaQueryListEvent) => void);
   }, []);
