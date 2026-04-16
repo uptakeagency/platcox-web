@@ -4,7 +4,7 @@ import { useReducedMotion } from "./useReducedMotion";
 import { useScrollProgress } from "./useScrollProgress";
 
 const MOBILE_QUERY = "(max-width: 767px)";
-const FRAME_COUNT = 30;
+const FRAME_COUNT = 220;
 
 function buildFrameUrls(): string[] {
   return Array.from({ length: FRAME_COUNT }, (_, i) => {
