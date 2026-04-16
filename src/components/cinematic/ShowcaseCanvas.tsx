@@ -8,6 +8,7 @@ import { useScrollProgress } from "./useScrollProgress";
 const IMAGE_A = "/images/cinematic/cinematic-a.webp";
 const IMAGE_B = "/images/cinematic/cinematic-b.webp";
 const NOISE   = "/images/cinematic/noise.webp";
+const MOBILE_QUERY = "(max-width: 767px)";
 
 class WebGLBoundary extends Component<{ children: ReactNode; fallback: ReactNode }, { errored: boolean }> {
   state = { errored: false };
@@ -22,7 +23,7 @@ export default function ShowcaseCanvas() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const mq = window.matchMedia("(max-width: 767px)");
+    const mq = window.matchMedia(MOBILE_QUERY);
     setIsMobile(mq.matches);
     const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
     mq.addEventListener("change", handler);
@@ -33,6 +34,8 @@ export default function ShowcaseCanvas() {
     triggerSelector: "#cinematic-showcase",
     pinDistanceDesktop: "+=150%",
     pinDistanceMobile: "+=100%",
+    mobileQuery: MOBILE_QUERY,
+    disabled: reduced,
   });
 
   if (reduced) return <ShowcaseFallback />;

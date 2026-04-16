@@ -1,5 +1,5 @@
-import { useMemo, useRef, type RefObject } from "react";
-import { useFrame, useLoader } from "@react-three/fiber";
+import { useEffect, useMemo, useRef, type RefObject } from "react";
+import { useFrame, useLoader, useThree } from "@react-three/fiber";
 import { TextureLoader, ShaderMaterial, type Mesh } from "three";
 import { vertex, fragment } from "./DisintegrateShader";
 
@@ -19,6 +19,7 @@ export default function DisintegrateMesh({
   segments = 64,
 }: DisintegrateMeshProps) {
   const meshRef = useRef<Mesh>(null);
+  const viewport = useThree((s) => s.viewport);
 
   const [texA, texB, texNoise] = useLoader(TextureLoader, [imageA, imageB, noise]);
 
@@ -37,14 +38,21 @@ export default function DisintegrateMesh({
     });
   }, [texA, texB, texNoise]);
 
+  // Dispose the previous ShaderMaterial when it's replaced (Important #3: GPU leak fix)
+  useEffect(() => {
+    return () => {
+      material.dispose();
+    };
+  }, [material]);
+
   useFrame((_state, delta) => {
-    material.uniforms.uProgress.value = progressRef.current ?? 0;
+    material.uniforms.uProgress.value = progressRef.current;
     material.uniforms.uTime.value += delta;
   });
 
   return (
     <mesh ref={meshRef}>
-      <planeGeometry args={[16, 9, segments, segments]} />
+      <planeGeometry args={[viewport.width, viewport.height, segments, segments]} />
       <primitive object={material} attach="material" />
     </mesh>
   );

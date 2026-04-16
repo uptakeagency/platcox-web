@@ -10,6 +10,7 @@ export interface UseScrollProgressOptions {
   pinDistanceDesktop: string; // e.g. "+=150%"
   pinDistanceMobile: string;  // e.g. "+=100%"
   mobileQuery?: string;       // default: "(max-width: 767px)"
+  disabled?: boolean;         // when true, no ScrollTrigger is created (e.g. reduced-motion)
 }
 
 export function useScrollProgress(opts: UseScrollProgressOptions): RefObject<number> {
@@ -17,6 +18,8 @@ export function useScrollProgress(opts: UseScrollProgressOptions): RefObject<num
 
   useEffect(() => {
     if (typeof window === "undefined") return;
+    if (opts.disabled) return;
+
     const el = document.querySelector(opts.triggerSelector);
     if (!el) {
       console.warn(`[useScrollProgress] Trigger element not found: ${opts.triggerSelector}`);
@@ -45,7 +48,7 @@ export function useScrollProgress(opts: UseScrollProgressOptions): RefObject<num
       st.kill(true); // true = also remove pin spacer
       lenis?.off("scroll", onLenisScroll);
     };
-  }, [opts.triggerSelector, opts.pinDistanceDesktop, opts.pinDistanceMobile, opts.mobileQuery]);
+  }, [opts.triggerSelector, opts.pinDistanceDesktop, opts.pinDistanceMobile, opts.mobileQuery, opts.disabled]);
 
   return progress;
 }
