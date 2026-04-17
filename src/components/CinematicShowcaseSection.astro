@@ -11,33 +11,4 @@ import ShowcaseCanvasFrames from "./cinematic/ShowcaseCanvasFrames.tsx";
   <div class="absolute inset-0">
     <ShowcaseCanvasFrames client:visible />
   </div>
-
-  <div
-    id="cinematic-manifesto"
-    class="pointer-events-none absolute inset-x-0 bottom-[12%] flex justify-center px-6 opacity-0 transition-[opacity,transform] duration-700"
-    data-manifesto
-  >
-    <p class="text-center text-4xl font-light leading-tight tracking-tight md:text-6xl lg:text-7xl">
-      Global trade, <span class="font-semibold">redefined.</span>
-    </p>
-  </div>
 </section>
-
-<script>
-  // Reveal the manifesto when the section has scrolled past ~85% of its pin distance.
-  // Lightweight; does not depend on GSAP (avoids double-animating from the canvas side).
-  const section = document.getElementById("cinematic-showcase");
-  const manifesto = section?.querySelector<HTMLElement>("[data-manifesto]") ?? null;
-  if (section && manifesto) {
-    const onScroll = () => {
-      const rect = section.getBoundingClientRect();
-      const total = rect.height - window.innerHeight;
-      const traveled = Math.min(Math.max(-rect.top, 0), total);
-      const progress = total > 0 ? traveled / total : 0;
-      manifesto.style.opacity = progress > 0.85 ? "1" : "0";
-      manifesto.style.transform = `translateY(${progress > 0.85 ? 0 : 8}px)`;
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
-  }
-</script>
