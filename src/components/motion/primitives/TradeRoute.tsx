@@ -41,6 +41,7 @@ export default function TradeRoute({
   return (
     <svg
       viewBox="0 0 200 100"
+      overflow="visible"
       className={`trade-route ${className}`.trim()}
       data-motion-trigger={trigger}
       data-motion-id={motionId}
