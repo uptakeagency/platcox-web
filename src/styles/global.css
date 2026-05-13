@@ -21,13 +21,17 @@
   }
 }
 
+/* Breathing: scale ile yap (Codex P2). Önceki `r: 4 → 5` keyframe'i
+   weight prop'unun set ettiği r={4+weight}'i override ediyordu →
+   weighted node'lar uniform boya çöküyordu. transform:scale her
+   weight'i orantılı şişiriyor; r ham değeri korunuyor. */
 @keyframes ontology-breath {
   0%,
   100% {
-    r: 4;
+    transform: scale(1);
   }
   50% {
-    r: 5;
+    transform: scale(1.125);
   }
 }
 
@@ -38,6 +42,8 @@
 }
 
 [data-ontology-node] {
+  transform-box: fill-box;
+  transform-origin: center;
   animation: ontology-breath 3s ease-in-out infinite;
 }
 

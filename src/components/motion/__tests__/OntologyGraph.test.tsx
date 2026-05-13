@@ -101,6 +101,25 @@ describe("OntologyGraph", () => {
     );
   });
 
+  // Codex P2: weight prop'u r'ye yansımalı; CSS keyframe r'yi override etmemeli.
+  it("preserves per-node `weight` in the rendered circle r (CSS scale animasyonu r'yi bozmamalı)", () => {
+    const weightedGraph = {
+      nodes: [
+        { id: "small", x: 10, y: 10, label: "S", weight: 0 },
+        { id: "big", x: 30, y: 30, label: "B", weight: 4 },
+      ],
+      edges: [],
+    };
+    const { container } = render(
+      <OntologyGraph {...weightedGraph} ariaLabel="weighted" />,
+    );
+    const circles = container.querySelectorAll(
+      "[data-ontology-node]",
+    ) as NodeListOf<SVGCircleElement>;
+    expect(circles[0].getAttribute("r")).toBe("4");
+    expect(circles[1].getAttribute("r")).toBe("8");
+  });
+
   it("dangling edge (referencing a missing node) is skipped silently", () => {
     const graphWithDangling = {
       nodes: [{ id: "n1", x: 0, y: 0, label: "A" }],
