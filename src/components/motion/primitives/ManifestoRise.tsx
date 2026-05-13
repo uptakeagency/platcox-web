@@ -1,11 +1,21 @@
 import { motion } from "framer-motion";
-import { createElement, type Ref } from "react";
+import { createElement, useState, type Ref } from "react";
 import { useReducedMotion } from "../hooks/useReducedMotion";
 import { useInViewport } from "../hooks/useInViewport";
 import {
   useScrollProgress,
   type ScrollAdapter,
 } from "../hooks/useScrollProgress";
+
+// Reduced-motion'ı mount-time sync olarak yakala (Codex P2): hook'un
+// SSR-safe pattern'i ilk render false dönüyor; scroll-progress dalında
+// bu race ScrollTrigger.create + cleanup arasında pin spacer flicker
+// yaratıyor. useState initializer client-side ilk render'da çalışır.
+function getReducedSync(): boolean {
+  if (typeof window === "undefined") return false;
+  if (typeof window.matchMedia !== "function") return false;
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
 import { toFramerSeconds } from "../adapters/framer";
 import { DURATION, EASE } from "../tokens";
 import type { BaseReactProps } from "../types";
@@ -35,6 +45,10 @@ export default function ManifestoRise({
   ariaLabel,
 }: ManifestoRiseProps) {
   const reduced = useReducedMotion();
+  // Mount-time sync detection — useReducedMotion async sync'ten önceki
+  // ScrollTrigger pin spacer flicker'ını önler.
+  const [reducedSync] = useState<boolean>(getReducedSync);
+  const effectiveReduced = reduced || reducedSync;
   const { ref, isInView } = useInViewport({ threshold: 0.3, once: true });
 
   // Phase 5 Task 5.3: scroll-progress variant.
@@ -42,17 +56,15 @@ export default function ManifestoRise({
   // disabled flag ile gate'liyoruz. reduced-motion veya farklı trigger'da no-op.
   const isScrollMode = trigger === "scroll-progress";
   useScrollProgress({
-    triggerSelector: sectionId
-      ? `#${sectionId}`
-      : "__manifesto-noop__",
+    triggerSelector: sectionId ? `#${sectionId}` : "__manifesto-noop__",
     pinDistanceDesktop: "+=150%",
     pinDistanceMobile: "+=100%",
-    disabled: !isScrollMode || reduced || !sectionId,
+    disabled: !isScrollMode || effectiveReduced || !sectionId,
     adapter: scrollAdapter,
   });
 
   // Reduced-motion: framer-motion bypass, plain heading
-  if (reduced) {
+  if (effectiveReduced) {
     return createElement(
       as,
       {

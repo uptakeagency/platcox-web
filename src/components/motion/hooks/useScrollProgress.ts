@@ -2,7 +2,16 @@ import { useEffect, useRef, type RefObject } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-gsap.registerPlugin(ScrollTrigger);
+// ScrollTrigger.registerPlugin module-load'da global wheel/scroll/resize
+// listener'larını ve rAF loop'unu kurar (Codex P2). Hook'u import eden ama
+// scroll-progress kullanmayan sayfaların bu cost'u ödememesi için kaydı
+// erteliyoruz — sadece adapter+element guard'ları geçtiğinde tetikleniyor.
+let scrollTriggerRegistered = false;
+function ensureScrollTriggerRegistered() {
+  if (scrollTriggerRegistered) return;
+  gsap.registerPlugin(ScrollTrigger);
+  scrollTriggerRegistered = true;
+}
 
 // Lenis veya GSAP-uyumlu başka bir scroll provider için minimal arayüz.
 // Hook bu adapter üzerinden subscribe eder; concrete Lenis sınıfı app-shell
@@ -47,6 +56,7 @@ export function useScrollProgress(
       return;
     }
 
+    ensureScrollTriggerRegistered();
     const mq = window.matchMedia(opts.mobileQuery ?? "(max-width: 767px)");
 
     const onAdapterScroll = () => ScrollTrigger.update();
