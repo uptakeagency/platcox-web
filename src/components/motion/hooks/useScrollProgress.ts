@@ -1,8 +1,12 @@
 import { useEffect, useRef, type RefObject } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-// Phase 0'da inert tutulan scroll progress hook'u.
-// Gerçek GSAP+Lenis bağlantısı Phase 5'te (Task 5.2) eklendiğinde
-// adapter parametresi üzerinden enjekte edilecek.
+gsap.registerPlugin(ScrollTrigger);
+
+// Lenis veya GSAP-uyumlu başka bir scroll provider için minimal arayüz.
+// Hook bu adapter üzerinden subscribe eder; concrete Lenis sınıfı app-shell
+// tarafından enjekte edilir (spec §10.1).
 export interface ScrollAdapter {
   on: (event: "scroll", cb: () => void) => void;
   off: (event: "scroll", cb: () => void) => void;
@@ -17,6 +21,10 @@ export interface UseScrollProgressOptions {
   adapter?: ScrollAdapter | null;
 }
 
+// useScrollProgress: GSAP ScrollTrigger + injected scroll adapter (Lenis).
+// adapter verilmezse veya disabled=true ise no-op kalır (Phase 0 inert kontratı).
+// Adapter sağlandığında: triggerSelector elementini pin'ler, scroll progress'i
+// progress.current ref'inde (0..1) tutar; bileşenler ref'i rAF içinde okur.
 export function useScrollProgress(
   opts: UseScrollProgressOptions,
 ): RefObject<number> {
@@ -28,16 +36,50 @@ export function useScrollProgress(
     if (!opts.adapter) return;
 
     const adapter = opts.adapter;
-    // Phase 5'te GSAP ScrollTrigger ile gerçek değerle dolacak;
-    // şimdilik no-op handler kaydı tutuyoruz ki teardown sözleşmesi yerinde olsun.
-    const onScroll = () => {
-      // Phase 5: progress.current = computed value
-    };
-    adapter.on("scroll", onScroll);
+    const el = document.querySelector(opts.triggerSelector);
+    if (!el) {
+      if (import.meta.env.DEV) {
+        // eslint-disable-next-line no-console
+        console.warn(
+          `[useScrollProgress] Trigger element bulunamadı: ${opts.triggerSelector}`,
+        );
+      }
+      return;
+    }
+
+    const mq = window.matchMedia(opts.mobileQuery ?? "(max-width: 767px)");
+
+    const onAdapterScroll = () => ScrollTrigger.update();
+    adapter.on("scroll", onAdapterScroll);
+
+    const st = ScrollTrigger.create({
+      trigger: el,
+      start: "top top",
+      end: () =>
+        mq.matches ? opts.pinDistanceMobile : opts.pinDistanceDesktop,
+      pin: true,
+      scrub: 1,
+      onUpdate: (self) => {
+        progress.current = self.progress;
+      },
+    });
+
+    const onBreakpointChange = () => ScrollTrigger.refresh();
+    mq.addEventListener("change", onBreakpointChange);
+
     return () => {
-      adapter.off("scroll", onScroll);
+      st.kill(true); // pin spacer'ı da kaldır
+      adapter.off("scroll", onAdapterScroll);
+      mq.removeEventListener("change", onBreakpointChange);
     };
-  }, [opts.triggerSelector, opts.disabled, opts.adapter]);
+  }, [
+    opts.triggerSelector,
+    opts.pinDistanceDesktop,
+    opts.pinDistanceMobile,
+    opts.mobileQuery,
+    opts.disabled,
+    opts.adapter,
+  ]);
 
   return progress;
 }
