@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { createElement, useState, type Ref } from "react";
+import { createElement, useEffect, useState, type Ref } from "react";
 import { useReducedMotion } from "../hooks/useReducedMotion";
 import { useInViewport } from "../hooks/useInViewport";
 import {
@@ -45,10 +45,17 @@ export default function ManifestoRise({
   ariaLabel,
 }: ManifestoRiseProps) {
   const reduced = useReducedMotion();
-  // Mount-time sync detection — useReducedMotion async sync'ten önceki
-  // ScrollTrigger pin spacer flicker'ını önler.
-  const [reducedSync] = useState<boolean>(getReducedSync);
-  const effectiveReduced = reduced || reducedSync;
+  // Mount-time sync detection (Codex P2): yalnızca ilk render'da kullanılır
+  // (ScrollTrigger pin-spacer flicker'ı önleme). Mount sonrası useReducedMotion
+  // canlı senkron olduğundan ona delege ederiz; aksi halde kullanıcı OS/browser
+  // reduced-motion ayarını kapatınca da animation sonsuza kadar kilitli kalırdı
+  // (Codex P3 follow-up).
+  const [initialReducedSync] = useState<boolean>(getReducedSync);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  const effectiveReduced = mounted ? reduced : initialReducedSync;
   const { ref, isInView } = useInViewport({ threshold: 0.3, once: true });
 
   // Phase 5 Task 5.3: scroll-progress variant.
