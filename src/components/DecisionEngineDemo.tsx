@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import TickCounter from "./motion/primitives/TickCounter";
+import DecisionPulse from "./motion/primitives/DecisionPulse";
 
 const INITIAL_ALERTS = [{ id: 1, message: "Register #3 is idle", type: "warning", time: "Just now" }];
 const NEW_ALERTS = [
@@ -110,12 +112,16 @@ function LiveTrackingView() {
         <div className="grid grid-cols-2 gap-4 mb-8">
           <div className="p-4 rounded-lg bg-zinc-900 border border-zinc-800">
             <div className="text-xs text-zinc-500 mb-1">Service Time</div>
-            <div className="text-xl font-medium text-emerald-400">142s</div>
+            <div className="text-xl font-medium text-emerald-400">
+              <TickCounter target={142} suffix="s" durationMs={1200} />
+            </div>
             <div className="text-[10px] text-zinc-600">Target 150s</div>
           </div>
           <div className="p-4 rounded-lg bg-zinc-900 border border-zinc-800">
             <div className="text-xs text-zinc-500 mb-1">Occupancy</div>
-            <div className="text-xl font-medium text-blue-400">76%</div>
+            <div className="text-xl font-medium text-blue-400">
+              <TickCounter target={0.76} format="percent" durationMs={1200} />
+            </div>
             <div className="text-[10px] text-zinc-600">Optimal</div>
           </div>
         </div>
@@ -125,9 +131,19 @@ function LiveTrackingView() {
         <div className="flex-1 flex flex-col gap-3 relative overflow-hidden">
           <AnimatePresence>
             {alerts.map((alert) => (
-              <motion.div key={alert.id} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className={`p-3 rounded-lg border text-sm ${alert.type === "error" ? "bg-red-500/10 border-red-500/20 text-red-200" : "bg-orange-500/10 border-orange-500/20 text-orange-200"}`}>
-                <div className="flex justify-between items-start mb-1"><span className="font-medium text-xs">{alert.type === "error" ? "CRITICAL" : "NOTICE"}</span><span className="text-[10px] opacity-60">{alert.time}</span></div>
-                <p className="opacity-90">{alert.message}</p>
+              <motion.div
+                key={alert.id}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className={`p-3 rounded-lg border text-sm ${alert.type === "error" ? "bg-red-500/10 border-red-500/20 text-red-200" : "bg-orange-500/10 border-orange-500/20 text-orange-200"}`}
+              >
+                <DecisionPulse
+                  title={alert.message}
+                  value={alert.type === "error" ? "CRITICAL" : "NOTICE"}
+                  trend={alert.type === "error" ? "down" : "neutral"}
+                  className="text-current"
+                />
+                <p className="text-[10px] opacity-60 mt-1">{alert.time}</p>
               </motion.div>
             ))}
           </AnimatePresence>
