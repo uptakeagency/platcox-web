@@ -13,6 +13,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import TradeRoute from "../components/motion/primitives/TradeRoute";
 import SketchStroke from "../components/motion/primitives/SketchStroke";
 import NumberedReveal from "../components/motion/primitives/NumberedReveal";
+import ManifestoRise from "../components/motion/primitives/ManifestoRise";
 
 const numberedItems = [
   { num: "/0.1", title: "Strateji sonradan akla gelmiş bir şey değildir." },
@@ -121,6 +122,16 @@ const numberedItems = [
       <div style="width: 240px; color: #16a34a;">
         <SketchStroke client:load shape="arrow" />
       </div>
+    </section>
+
+    <section class="demo">
+      <h2>ManifestoRise — default (h1, 2 satır)</h2>
+      <ManifestoRise client:load lines={["Where Global Trade", "Gets Redefined."]} />
+    </section>
+
+    <section class="demo">
+      <h2>ManifestoRise — yavaş cinematic (3 satır, 400ms stagger)</h2>
+      <ManifestoRise client:load lines={["Data into Direction.", "Foresight into Reality.", "From Concept to Commerce."]} durationMs={2400} staggerDelay={400} as="h2" />
     </section>
 
     <section class="demo">
