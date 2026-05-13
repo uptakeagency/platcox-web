@@ -109,6 +109,18 @@ const jsonLd = {
   <body>
     <slot />
 
+    <!-- Lenis smooth scroll: site-wide momentum scrolling. reduced-motion
+         kullanıcılarında native scroll'a düşer. -->
+    <script>
+      import { getLenis } from "../lib/lenisSingleton";
+      const reduceMotion = window.matchMedia?.(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+      if (!reduceMotion) {
+        getLenis();
+      }
+    </script>
+
     <!-- Sayfa-düzeyi motion observer: tüm SMIL primitive'leri için tek IntersectionObserver. -->
     <script is:inline>
       (function initMotionObserver() {
