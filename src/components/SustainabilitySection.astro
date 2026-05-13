@@ -1,5 +1,5 @@
 ---
-import ScrollReveal from "./ScrollReveal.tsx";
+import ScrollReveal from "./motion/ScrollReveal";
 import LazyVideo from "./LazyVideo.astro";
 
 const pillars = [
@@ -18,13 +18,13 @@ const pillars = [
       </h2>
     </ScrollReveal>
 
-    <ScrollReveal client:visible animation="fade-in" delay={0.2}>
+    <ScrollReveal client:visible animation="fade-in" delay={200}>
       <div class="mt-16 aspect-video overflow-hidden bg-white/5">
         <LazyVideo src="/videos/sustainability.mp4" class="h-full w-full object-cover" />
       </div>
     </ScrollReveal>
 
-    <ScrollReveal client:visible animation="fade-up" delay={0.3}>
+    <ScrollReveal client:visible animation="fade-up" delay={300}>
       <blockquote class="mt-16 border-l-2 border-accent pl-6 text-xl italic text-white/60">
         "Sustainability is not a promise. It is a system."
       </blockquote>
@@ -32,7 +32,7 @@ const pillars = [
 
     <div class="mt-20 grid gap-4 md:grid-cols-3">
       {pillars.map((p, i) => (
-        <ScrollReveal client:visible animation="fade-up" delay={0.1 + i * 0.15}>
+        <ScrollReveal client:visible animation="fade-up" delay={100 + i * 150}>
           <div class="bg-white/5 p-8">
             <span class="text-sm font-medium text-accent">{p.num}</span>
             <h3 class="mt-2 text-xl font-medium text-white">{p.title}</h3>
@@ -42,7 +42,7 @@ const pillars = [
       ))}
     </div>
 
-    <ScrollReveal client:visible animation="fade-in" delay={0.3}>
+    <ScrollReveal client:visible animation="fade-in" delay={300}>
       <p class="mt-16 text-center text-white/40">
         We do not claim to save the world. We design systems that make global commerce more responsible by default.
       </p>

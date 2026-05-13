@@ -1,5 +1,6 @@
 import { describe, it, expect } from "bun:test";
 import { renderHook, act } from "@testing-library/react";
+import { renderToString } from "react-dom/server";
 import { useReducedMotion } from "../hooks/useReducedMotion";
 
 function mockMatchMedia(matches: boolean) {
@@ -64,5 +65,18 @@ describe("useReducedMotion", () => {
     delete (window as any).matchMedia;
     const { result } = renderHook(() => useReducedMotion());
     expect(result.current).toBe(false);
+  });
+
+  // Codex P1 hydration mismatch fix: ilk render'da server ile aynı
+  // deterministik değer (false) dönmeli; gerçek değer post-mount'ta gelir.
+  it("returns false during the initial server render even when matchMedia would match (no hydration mismatch)", () => {
+    mockMatchMedia(true);
+    let firstValue: boolean | undefined;
+    function Probe() {
+      firstValue = useReducedMotion();
+      return null;
+    }
+    renderToString(<Probe />);
+    expect(firstValue).toBe(false);
   });
 });

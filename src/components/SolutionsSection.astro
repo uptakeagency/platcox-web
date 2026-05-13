@@ -1,5 +1,5 @@
 ---
-import ScrollReveal from "./ScrollReveal.tsx";
+import ScrollReveal from "./motion/ScrollReveal";
 
 const solutions = [
   { num: "/01", title: "Idea Factories", description: "Creative churns & birth of concepts and ideas" },
@@ -25,7 +25,7 @@ const solutions = [
 
     <div class="mt-20">
       {solutions.map((s, i) => (
-        <ScrollReveal client:visible animation="fade-up" delay={i * 0.1}>
+        <ScrollReveal client:visible animation="fade-up" delay={i * 100}>
           <div class="flex items-start justify-between gap-8 border-t border-border py-8">
             <div>
               <h3 class="text-xl font-medium text-foreground">{s.title}</h3>

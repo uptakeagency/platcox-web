@@ -1,6 +1,6 @@
 ---
 import { getCollection } from "astro:content";
-import ScrollReveal from "./ScrollReveal.tsx";
+import ScrollReveal from "./motion/ScrollReveal";
 
 const posts = (await getCollection("news"))
   .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
@@ -16,7 +16,7 @@ const posts = (await getCollection("news"))
 
     <div class="mt-20 grid gap-8 md:grid-cols-2">
       {posts.map((post, i) => (
-        <ScrollReveal client:visible animation="fade-up" delay={i * 0.15}>
+        <ScrollReveal client:visible animation="fade-up" delay={i * 150}>
           <a href={`/news/${post.id}`} class="group block border-t border-border pt-6">
             <div class="aspect-video bg-surface-alt mb-4"></div>
             <div class="flex items-center gap-3">

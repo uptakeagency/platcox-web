@@ -1,5 +1,5 @@
 ---
-import ScrollReveal from "./ScrollReveal.tsx";
+import ScrollReveal from "./motion/ScrollReveal";
 
 const principles = [
   { title: "DISCIPLINE", description: "Precision logistics and operations, executed quietly." },
@@ -19,7 +19,7 @@ const principles = [
 
     <div class="mt-20 grid gap-4 md:grid-cols-3">
       {principles.map((p, i) => (
-        <ScrollReveal client:visible animation="fade-up" delay={i * 0.1}>
+        <ScrollReveal client:visible animation="fade-up" delay={i * 100}>
           <div class="bg-surface-alt p-8">
             <p class="text-[11px] font-medium uppercase tracking-[2px] text-muted">{p.title}</p>
             <p class="mt-4 text-foreground">{p.description}</p>

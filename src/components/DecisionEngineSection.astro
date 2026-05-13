@@ -1,5 +1,5 @@
 ---
-import ScrollReveal from "./ScrollReveal.tsx";
+import ScrollReveal from "./motion/ScrollReveal";
 import DecisionEngineDemo from "./DecisionEngineDemo.tsx";
 ---
 
@@ -19,7 +19,7 @@ import DecisionEngineDemo from "./DecisionEngineDemo.tsx";
       </div>
     </ScrollReveal>
 
-    <ScrollReveal client:visible animation="fade-up" delay={0.2}>
+    <ScrollReveal client:visible animation="fade-up" delay={200}>
       <DecisionEngineDemo client:visible />
     </ScrollReveal>
   </div>

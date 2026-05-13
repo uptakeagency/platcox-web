@@ -1,5 +1,5 @@
 ---
-import ScrollReveal from "./ScrollReveal.tsx";
+import ScrollReveal from "./motion/ScrollReveal";
 import LazyVideo from "./LazyVideo.astro";
 
 const clients = [
@@ -49,7 +49,7 @@ const reasons = [
       </ScrollReveal>
 
       <div class="mt-12 grid gap-12 md:grid-cols-2">
-        <ScrollReveal client:visible animation="fade-up" delay={0.1}>
+        <ScrollReveal client:visible animation="fade-up" delay={100}>
           <div>
             <p class="section-label">WHO WE WORK WITH</p>
             <ul class="mt-4 space-y-3">
@@ -60,7 +60,7 @@ const reasons = [
           </div>
         </ScrollReveal>
 
-        <ScrollReveal client:visible animation="fade-up" delay={0.2}>
+        <ScrollReveal client:visible animation="fade-up" delay={200}>
           <div>
             <p class="section-label">WHY PLATCOX</p>
             <ul class="mt-4 space-y-3">

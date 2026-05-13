@@ -1,5 +1,5 @@
 ---
-import ScrollReveal from "./ScrollReveal.tsx";
+import ScrollReveal from "./motion/ScrollReveal";
 
 const items = [
   { num: "/0.1", text: "Every operation is meticulously organized — strategy isn't an afterthought." },
@@ -19,7 +19,7 @@ const items = [
 
     <div class="mt-24">
       {items.map((item, i) => (
-        <ScrollReveal client:visible animation="fade-up" delay={i * 0.15}>
+        <ScrollReveal client:visible animation="fade-up" delay={i * 150}>
           <div class="flex items-start justify-between gap-8 border-t border-border py-10">
             <p class="text-lg text-foreground md:text-xl">{item.text}</p>
             <span class="section-number shrink-0">{item.num}</span>
