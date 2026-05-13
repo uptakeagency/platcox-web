@@ -16,6 +16,13 @@ import NumberedReveal from "../components/motion/primitives/NumberedReveal";
 import ManifestoRise from "../components/motion/primitives/ManifestoRise";
 import TickCounter from "../components/motion/primitives/TickCounter";
 import DecisionPulse from "../components/motion/primitives/DecisionPulse";
+import DataScan from "../components/motion/primitives/DataScan";
+
+const dataScanRows = [
+  { label: "Karachi → Rotterdam", value: "14g" },
+  { label: "Shenzhen → Hamburg", value: "28g" },
+  { label: "İstanbul → New York", value: "11g" },
+];
 
 const numberedItems = [
   { num: "/0.1", title: "Strateji sonradan akla gelmiş bir şey değildir." },
@@ -123,6 +130,20 @@ const numberedItems = [
       <h2>SketchStroke — arrow</h2>
       <div style="width: 240px; color: #16a34a;">
         <SketchStroke client:load shape="arrow" />
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>DataScan — varsayılan (mono, 3 satır)</h2>
+      <div style="width: 420px; color: #111;">
+        <DataScan client:load rows={dataScanRows} />
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>DataScan — mono=false, çok satır</h2>
+      <div style="width: 420px; color: #2563eb;">
+        <DataScan client:load rows={[...dataScanRows, ...dataScanRows]} mono={false} />
       </div>
     </section>
 
