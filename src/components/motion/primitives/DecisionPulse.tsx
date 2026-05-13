@@ -81,6 +81,9 @@ const DecisionPulse = forwardRef<
               height: 8,
               borderRadius: "50%",
               background: trendColor,
+              // pulse-ring keyframe currentColor kullanıyor: halo'nun
+              // trend rengiyle eşleşmesi için color'ı dot'la birlikte set ediyoruz.
+              color: trendColor,
               animation: "pulse-ring 1.8s ease-out infinite",
             }}
           />

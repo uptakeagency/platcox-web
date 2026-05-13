@@ -34,7 +34,13 @@ function formatValue(
 ): string {
   let effectiveFormat = format;
   if (format === "currency" && !currency) {
-    if (!warnedNoCurrency && typeof console !== "undefined") {
+    // Codex P3: warning sadece dev build'de basılsın; production SSR / static
+    // build / normal test çıktısı sessiz kalsın (runtime fallback her ortamda).
+    if (
+      !warnedNoCurrency &&
+      typeof console !== "undefined" &&
+      import.meta.env.DEV
+    ) {
       // eslint-disable-next-line no-console
       console.warn(
         "TickCounter: format=\"currency\" verildi ama currency prop'u yok — decimal'a düşülüyor.",

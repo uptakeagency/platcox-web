@@ -33,24 +33,30 @@ export default function DataScan({
   const { ref, isInView } = useInViewport({ threshold: 0.3, once: true });
   const fontFamily = mono ? "'JetBrains Mono', Courier, monospace" : "inherit";
 
+  // Codex P2: scan-bar artık <dl> child'ı değil, sibling wrapper'da.
+  // <dl> sadece dt/dd gruplarını içeriyor (HTML spec'i, a11y validator).
+  const rootStyle = { fontFamily, position: "relative" as const };
+
   if (reduced) {
     return (
-      <dl
-        ref={ref as RefObject<HTMLDListElement>}
+      <div
+        ref={ref as RefObject<HTMLDivElement>}
         className={className}
         aria-label={ariaLabel}
-        style={{ fontFamily, position: "relative" }}
+        style={rootStyle}
       >
-        {rows.map((row, i) => (
-          <div
-            key={i}
-            style={{ display: "flex", justifyContent: "space-between" }}
-          >
-            <dt>{row.label}</dt>
-            <dd style={{ fontWeight: 600, margin: 0 }}>{row.value}</dd>
-          </div>
-        ))}
-      </dl>
+        <dl style={{ margin: 0 }}>
+          {rows.map((row, i) => (
+            <div
+              key={i}
+              style={{ display: "flex", justifyContent: "space-between" }}
+            >
+              <dt>{row.label}</dt>
+              <dd style={{ fontWeight: 600, margin: 0 }}>{row.value}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
     );
   }
 
@@ -61,44 +67,46 @@ export default function DataScan({
   };
 
   return (
-    <dl
-      ref={ref as RefObject<HTMLDListElement>}
+    <div
+      ref={ref as RefObject<HTMLDivElement>}
       className={className}
       aria-label={ariaLabel}
-      style={{ fontFamily, position: "relative" }}
+      style={rootStyle}
     >
-      {rows.map((row, i) => {
-        const transition = {
-          duration: toFramerSeconds(durationMs),
-          delay: toFramerSeconds(staggerDelay * i),
-          ease: EASE.scan,
-        };
-        return (
-          <div
-            key={i}
-            style={{ display: "flex", justifyContent: "space-between" }}
-          >
-            <motion.dt
-              initial="visible"
-              animate={animateState}
-              variants={variants}
-              transition={transition}
+      <dl style={{ margin: 0 }}>
+        {rows.map((row, i) => {
+          const transition = {
+            duration: toFramerSeconds(durationMs),
+            delay: toFramerSeconds(staggerDelay * i),
+            ease: EASE.scan,
+          };
+          return (
+            <div
+              key={i}
+              style={{ display: "flex", justifyContent: "space-between" }}
             >
-              {row.label}
-            </motion.dt>
-            <motion.dd
-              initial="visible"
-              animate={animateState}
-              variants={variants}
-              transition={transition}
-              style={{ fontWeight: 600, margin: 0 }}
-            >
-              {row.value}
-            </motion.dd>
-          </div>
-        );
-      })}
-      {/* Scan-bar: alt kenarda sürekli akan gradient çizgi (dekoratif) */}
+              <motion.dt
+                initial="visible"
+                animate={animateState}
+                variants={variants}
+                transition={transition}
+              >
+                {row.label}
+              </motion.dt>
+              <motion.dd
+                initial="visible"
+                animate={animateState}
+                variants={variants}
+                transition={transition}
+                style={{ fontWeight: 600, margin: 0 }}
+              >
+                {row.value}
+              </motion.dd>
+            </div>
+          );
+        })}
+      </dl>
+      {/* Scan-bar artık dl dışında — semantik kontrat korunuyor (Codex P2). */}
       <div
         aria-hidden="true"
         style={{
@@ -121,6 +129,6 @@ export default function DataScan({
           }}
         />
       </div>
-    </dl>
+    </div>
   );
 }

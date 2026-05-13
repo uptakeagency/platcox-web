@@ -64,4 +64,14 @@ describe("DataScan", () => {
       expect(screen.getByText(r.label)).toBeTruthy();
     });
   });
+
+  // Codex P2: <dl> sadece dt/dd grupları içerebilir; scan-bar dışında olmalı.
+  it("does not place the scan-bar inside the <dl> (HTML semantic contract)", () => {
+    const { container } = render(<DataScan rows={rows} />);
+    const dl = container.querySelector("dl") as HTMLElement;
+    const scanBar = container.querySelector("[data-scan-bar]") as HTMLElement;
+    expect(dl).toBeTruthy();
+    expect(scanBar).toBeTruthy();
+    expect(dl.contains(scanBar)).toBe(false);
+  });
 });
