@@ -11,6 +11,7 @@ if (import.meta.env.PROD) {
 
 import BaseLayout from "../layouts/BaseLayout.astro";
 import TradeRoute from "../components/motion/primitives/TradeRoute";
+import SketchStroke from "../components/motion/primitives/SketchStroke";
 ---
 
 <html lang="tr">
@@ -95,8 +96,31 @@ import TradeRoute from "../components/motion/primitives/TradeRoute";
     </section>
 
     <section class="demo">
-      <h2>SketchStroke</h2>
-      <p class="empty">Task 1.2'de eklenecek.</p>
+      <h2>SketchStroke — circle (default)</h2>
+      <div style="width: 240px; color: #111;">
+        <SketchStroke client:load />
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>SketchStroke — ring</h2>
+      <div style="width: 240px; color: #2563eb;">
+        <SketchStroke client:load shape="ring" />
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>SketchStroke — arrow</h2>
+      <div style="width: 240px; color: #16a34a;">
+        <SketchStroke client:load shape="arrow" />
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>SketchStroke — custom (üçgen)</h2>
+      <div style="width: 240px; color: #db2777;">
+        <SketchStroke client:load shape="custom" path="M 10 80 L 60 20 L 110 80 Z" durationMs={1500} />
+      </div>
     </section>
   </body>
 </html>
