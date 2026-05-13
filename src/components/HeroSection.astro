@@ -1,4 +1,5 @@
 ---
+import ManifestoRise from "./motion/primitives/ManifestoRise";
 import ScrollReveal from "./motion/ScrollReveal";
 ---
 
@@ -22,14 +23,14 @@ import ScrollReveal from "./motion/ScrollReveal";
 
   <!-- Content -->
   <div class="relative z-10 px-6">
-    <ScrollReveal client:visible animation="fade-up" delay={200} durationMs={800}>
-      <h1 class="text-center text-5xl font-light leading-tight tracking-tight md:text-7xl lg:text-[96px] lg:leading-[1.05] lg:tracking-[-2px]">
-        Where Global Trade<br />
-        Gets Rede<span class="font-semibold">fined</span>
-      </h1>
-    </ScrollReveal>
+    <ManifestoRise
+      client:load
+      lines={["Where Global Trade", "Gets Redefined."]}
+      as="h1"
+      className="text-center text-5xl font-light leading-tight tracking-tight md:text-7xl lg:text-[96px] lg:leading-[1.05] lg:tracking-[-2px]"
+    />
 
-    <ScrollReveal client:visible animation="fade-in" delay={600}>
+    <ScrollReveal client:load animation="fade-in" delay={600}>
       <p class="mt-6 text-center text-lg text-muted">
         Sourcing. Strategy. Intelligent Operations.
       </p>
