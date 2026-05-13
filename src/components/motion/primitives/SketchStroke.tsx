@@ -17,7 +17,10 @@ const SHAPE_PATHS: Record<Exclude<SketchShape, "custom">, string> = {
   circle:
     "M 60 20 Q 35 30, 30 60 Q 35 90, 60 90 Q 85 90, 90 60 Q 85 30, 60 20 Z",
   ring: "M 60 20 A 30 30 0 1 0 60 90 A 30 30 0 1 0 60 20 Z",
-  arrow: "M 10 50 L 90 50 L 75 35 M 90 50 L 75 65",
+  // Tek subpath: yatay çizgiyi çiz, ucundan yukarı arrowhead'e git, geri uca dön,
+  // sonra aşağı arrowhead'e git. İkinci M kullanılmıyor → tek continuous stroke,
+  // SMIL stroke-dashoffset patterns kesintisiz akar.
+  arrow: "M 10 50 L 90 50 L 75 35 L 90 50 L 75 65",
 };
 
 export default function SketchStroke({
