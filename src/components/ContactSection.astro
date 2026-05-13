@@ -5,7 +5,7 @@ import ContactForm from "./ContactForm.tsx";
 
 <section id="contact" class="section-padding">
   <div class="container-content">
-    <ScrollReveal client:visible animation="fade-up">
+    <ScrollReveal client:idle animation="fade-up">
       <p class="section-label">CONTACT</p>
       <h2 class="text-3xl font-light tracking-tight md:text-5xl">
         Let's start the conversation.
@@ -16,11 +16,11 @@ import ContactForm from "./ContactForm.tsx";
     </ScrollReveal>
 
     <div class="mt-20 grid gap-16 md:grid-cols-2">
-      <ScrollReveal client:visible animation="fade-up" delay={200}>
+      <ScrollReveal client:idle animation="fade-up" delay={200}>
         <ContactForm client:visible />
       </ScrollReveal>
 
-      <ScrollReveal client:visible animation="fade-in" delay={300}>
+      <ScrollReveal client:idle animation="fade-in" delay={300}>
         <div class="space-y-8">
           <div>
             <p class="text-sm font-medium text-foreground">Address</p>

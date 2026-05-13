@@ -9,14 +9,14 @@ const posts = (await getCollection("news"))
 
 <section id="news" class="section-padding">
   <div class="container-content">
-    <ScrollReveal client:visible animation="fade-up">
+    <ScrollReveal client:idle animation="fade-up">
       <p class="section-label">NEWS</p>
       <h2 class="text-3xl font-light tracking-tight md:text-5xl">Latest from PlatcoX</h2>
     </ScrollReveal>
 
     <div class="mt-20 grid gap-8 md:grid-cols-2">
       {posts.map((post, i) => (
-        <ScrollReveal client:visible animation="fade-up" delay={i * 150}>
+        <ScrollReveal client:idle animation="fade-up" delay={i * 150}>
           <a href={`/news/${post.id}`} class="group block border-t border-border pt-6">
             <div class="aspect-video bg-surface-alt mb-4"></div>
             <div class="flex items-center gap-3">

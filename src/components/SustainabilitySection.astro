@@ -11,20 +11,20 @@ const pillars = [
 
 <section id="sustainability" class="bg-dark py-24 md:py-[200px] px-6 md:px-8">
   <div class="container-content">
-    <ScrollReveal client:visible animation="fade-up">
+    <ScrollReveal client:idle animation="fade-up">
       <p class="text-[11px] font-medium uppercase tracking-[3px] text-accent mb-4">SUSTAINABILITY BY DESIGN</p>
       <h2 class="text-3xl font-light tracking-tight text-white md:text-5xl">
         Not a statement. An operating system.
       </h2>
     </ScrollReveal>
 
-    <ScrollReveal client:visible animation="fade-in" delay={200}>
+    <ScrollReveal client:idle animation="fade-in" delay={200}>
       <div class="mt-16 aspect-video overflow-hidden bg-white/5">
         <LazyVideo src="/videos/sustainability.mp4" class="h-full w-full object-cover" />
       </div>
     </ScrollReveal>
 
-    <ScrollReveal client:visible animation="fade-up" delay={300}>
+    <ScrollReveal client:idle animation="fade-up" delay={300}>
       <blockquote class="mt-16 border-l-2 border-accent pl-6 text-xl italic text-white/60">
         "Sustainability is not a promise. It is a system."
       </blockquote>
@@ -32,7 +32,7 @@ const pillars = [
 
     <div class="mt-20 grid gap-4 md:grid-cols-3">
       {pillars.map((p, i) => (
-        <ScrollReveal client:visible animation="fade-up" delay={100 + i * 150}>
+        <ScrollReveal client:idle animation="fade-up" delay={100 + i * 150}>
           <div class="bg-white/5 p-8">
             <span class="text-sm font-medium text-accent">{p.num}</span>
             <h3 class="mt-2 text-xl font-medium text-white">{p.title}</h3>
@@ -42,7 +42,7 @@ const pillars = [
       ))}
     </div>
 
-    <ScrollReveal client:visible animation="fade-in" delay={300}>
+    <ScrollReveal client:idle animation="fade-in" delay={300}>
       <p class="mt-16 text-center text-white/40">
         We do not claim to save the world. We design systems that make global commerce more responsible by default.
       </p>
