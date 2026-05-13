@@ -8,6 +8,9 @@ export default defineConfig({
   integrations: [
     react(),
     tailwind(),
-    sitemap(),
+    // motion-playground dev-only; sitemap.xml'e dahil edilmesin (Codex Task 0.15 P3).
+    sitemap({
+      filter: (page) => !page.endsWith("/motion-playground/"),
+    }),
   ],
 });
