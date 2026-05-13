@@ -59,4 +59,10 @@ describe("useReducedMotion", () => {
     expect(mm.getListenerCount()).toBe(0);
     expect(mm.getRemovedCount()).toBe(1);
   });
+
+  it("does not crash when window.matchMedia is undefined (returns false)", () => {
+    delete (window as any).matchMedia;
+    const { result } = renderHook(() => useReducedMotion());
+    expect(result.current).toBe(false);
+  });
 });
