@@ -1,8 +1,13 @@
 ---
 // Dev-only motion library playground.
-// "_" prefix Astro tarafında bu route'u production build'e dahil etmez.
 // Phase 0 Gate B kararı: v1'de Storybook yok, primitive demo'ları burada toplanır.
 // Phase 1+ task'larında her primitive ekleyince bu sayfaya bir <section> eklenir.
+//
+// Codex P2 (Task 0.15): "_" prefix astro dev'de de 404 verdiği için kaldırıldı.
+// Production erişimi runtime guard ile kapatılıyor.
+if (import.meta.env.PROD) {
+  return new Response(null, { status: 404 });
+}
 ---
 
 <html lang="tr">
