@@ -108,5 +108,78 @@ const jsonLd = {
   </head>
   <body>
     <slot />
+
+    <!-- Sayfa-düzeyi motion observer: tüm SMIL primitive'leri için tek IntersectionObserver. -->
+    <script is:inline>
+      (function initMotionObserver() {
+        if (typeof window === "undefined") return;
+        if (window.__motionObserver) return;
+
+        const targets = new Map();
+        const observer = new IntersectionObserver(
+          (entries) => {
+            for (const e of entries) {
+              const config = targets.get(e.target);
+              if (!config) continue;
+              if (e.isIntersecting) {
+                const animates = e.target.querySelectorAll(
+                  "animate, animateTransform, animateMotion"
+                );
+                animates.forEach((a) => a.beginElement && a.beginElement());
+                if (config.kind === "viewport-once") {
+                  observer.unobserve(e.target);
+                  targets.delete(e.target);
+                }
+              }
+            }
+          },
+          { threshold: 0.2, rootMargin: "0px" }
+        );
+
+        function attachAll() {
+          const els = document.querySelectorAll("[data-motion-trigger]");
+          els.forEach((el) => {
+            if (targets.has(el)) return;
+            const kind = el.getAttribute("data-motion-trigger");
+            if (kind !== "viewport-once" && kind !== "viewport-repeat") return;
+            targets.set(el, { kind });
+            observer.observe(el);
+          });
+        }
+
+        // trigger="manual" primitive'leri için imperatif çağrı.
+        window.__motionTrigger = function (id) {
+          const el = document.querySelector('[data-motion-id="' + id + '"]');
+          if (!el) return;
+          const animates = el.querySelectorAll(
+            "animate, animateTransform, animateMotion"
+          );
+          animates.forEach((a) => a.beginElement && a.beginElement());
+        };
+
+        window.__motionObserver = observer;
+
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", attachAll);
+        } else {
+          attachAll();
+        }
+        document.addEventListener("astro:after-swap", attachAll);
+      })();
+    </script>
+
+    <style is:global>
+      @media (prefers-reduced-motion: reduce) {
+        [data-motion-trigger] animate,
+        [data-motion-trigger] animateTransform,
+        [data-motion-trigger] animateMotion {
+          animation-play-state: paused;
+        }
+        /* Primitive'ler reduced-motion'da end-state'i sabitlemek için bu attribute'ı kullanır. */
+        [data-motion-reduced-end-state] {
+          stroke-dashoffset: 0 !important;
+        }
+      }
+    </style>
   </body>
 </html>
