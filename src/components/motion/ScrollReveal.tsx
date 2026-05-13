@@ -1,5 +1,5 @@
 import { motion, type Variant } from "framer-motion";
-import { useEffect, useState, type ReactNode, type RefObject } from "react";
+import { type ReactNode, type RefObject } from "react";
 import { useReducedMotion } from "./hooks/useReducedMotion";
 import { useInViewport } from "./hooks/useInViewport";
 import { toFramerSeconds } from "./adapters/framer";
@@ -31,14 +31,13 @@ const variants: Record<AnimationType, { hidden: Variant; visible: Variant }> = {
   "split-right": { hidden: { opacity: 0, x: 80 },     visible: { opacity: 1, x: 0 } },
 };
 
-// SSR-visible kontrat (spec §5.2.2): SSR HTML her zaman end-state ile basılır
-// (plain <div>, opacity:0 inline stili yok). Hydration sonrası motion.div'e
-// geçilir; useInViewport observer'ı element viewport'a girdiğinde animation
-// pipeline'ını tetikler.
-//
-// Codex P1 (Task 0.14 follow-up): Astro `client:visible` ile mount edilen
-// componentler zaten viewport içindedir; `initialInView` mount-time check'i
-// kaldırıldı çünkü her zaman true dönüyordu → motion.div'e hiç geçemiyorduk.
+// Tek motion.div mimarisi (Codex P1 follow-up, Task 0.14):
+// - SSR HTML'inde initial="visible" → end-state, opacity:1 (kontrat §5.2.2)
+// - Hydration sonrası AYNI element; ref re-attach problemi yok, observer
+//   detached node'a bağlı kalmaz.
+// - isInView=null (observer henüz callback vermedi) iken "visible" tercih
+//   edilir; ilk callback geldiğinde true/false ile transition tetiklenir.
+// - reduced-motion → plain <div>, animation pipeline tamamen bypass.
 export default function ScrollReveal({
   children,
   animation = "fade-up",
@@ -49,15 +48,8 @@ export default function ScrollReveal({
   const v = variants[animation];
   const reduced = useReducedMotion();
   const { ref, isInView } = useInViewport({ threshold: 0.2, once: true });
-  const [hydrated, setHydrated] = useState(false);
 
-  useEffect(() => {
-    setHydrated(true);
-  }, []);
-
-  // SSR + henüz hydrate olmamış + reduced-motion durumlarda
-  // animation pipeline'ı bypass → plain div, end-state.
-  if (!hydrated || reduced) {
+  if (reduced) {
     return (
       <div ref={ref as RefObject<HTMLDivElement>} className={className}>
         {children}
@@ -65,11 +57,13 @@ export default function ScrollReveal({
     );
   }
 
+  const animateState = isInView === false ? "hidden" : "visible";
+
   return (
     <motion.div
       ref={ref as RefObject<HTMLDivElement>}
-      initial="hidden"
-      animate={isInView ? "visible" : "hidden"}
+      initial="visible"
+      animate={animateState}
       variants={{
         hidden: v.hidden,
         visible: {

@@ -73,10 +73,13 @@ function releasePool(k: PoolKey) {
   }
 }
 
+// isInView ilk callback gelene kadar `null`. Tüketiciler null durumunda
+// SSR-safe varsayım yapabilir (genellikle "visible") ki observer initial
+// state'i belirleninceye kadar gizli kalmasınlar.
 export function useInViewport(opts: Options = {}) {
   const { threshold = 0.2, rootMargin = "0px", root = null, once = false } = opts;
   const ref = useRef<HTMLElement | null>(null);
-  const [isInView, setIsInView] = useState(false);
+  const [isInView, setIsInView] = useState<boolean | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined" || typeof IntersectionObserver !== "function") return;

@@ -8,7 +8,7 @@ interface ProbeProps {
   threshold?: number;
   rootMargin?: string;
   once?: boolean;
-  onState?: (s: { ref: RefObject<HTMLElement | null>; isInView: boolean }) => void;
+  onState?: (s: { ref: RefObject<HTMLElement | null>; isInView: boolean | null }) => void;
 }
 
 function Probe({ threshold = 0.2, rootMargin = "0px", once = false, onState }: ProbeProps) {
