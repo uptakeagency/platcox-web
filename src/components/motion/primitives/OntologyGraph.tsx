@@ -19,6 +19,8 @@ export interface OntologyEdge {
 export interface OntologyGraphProps extends BaseReactProps {
   nodes: OntologyNode[];
   edges: OntologyEdge[];
+  /** Tüm node'ların label'ını her zaman göster (focus-only davranışını kapatır). */
+  alwaysShowLabels?: boolean;
 }
 
 // OntologyGraph: keyboard-accessible interactive graph viz.
@@ -29,6 +31,7 @@ export interface OntologyGraphProps extends BaseReactProps {
 export default function OntologyGraph({
   nodes,
   edges,
+  alwaysShowLabels = false,
   className,
   ariaLabel,
 }: OntologyGraphProps) {
@@ -107,13 +110,14 @@ export default function OntologyGraph({
               fill="currentColor"
               data-ontology-node
             />
-            {isOpen && (
+            {(isOpen || alwaysShowLabels) && (
               <text
-                id={`detail-${node.id}`}
+                id={isOpen ? `detail-${node.id}` : undefined}
                 y={-10}
                 textAnchor="middle"
                 fontSize={8}
                 fill="currentColor"
+                fontWeight={isOpen ? 600 : 400}
               >
                 {node.label}
               </text>

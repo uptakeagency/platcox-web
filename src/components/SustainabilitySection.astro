@@ -1,6 +1,14 @@
 ---
 import ScrollReveal from "./motion/ScrollReveal";
 import LazyVideo from "./LazyVideo.astro";
+import SketchStroke from "./motion/primitives/SketchStroke";
+import DataScan from "./motion/primitives/DataScan";
+
+const impactMetrics = [
+  { label: "Atık sevkıyat azaltımı", value: "−31%" },
+  { label: "Yeniden kullanım payı", value: "+42%" },
+  { label: "Karbon yoğunluğu (rota başına)", value: "−18%" },
+];
 
 const pillars = [
   { num: "01", title: "Systemic Efficiency", description: "Sustainability is embedded into workflows — not treated as a campaign layer. We optimize for output, clarity, and operational discipline." },
@@ -25,9 +33,14 @@ const pillars = [
     </ScrollReveal>
 
     <ScrollReveal client:idle animation="fade-up" delay={300}>
-      <blockquote class="mt-16 border-l-2 border-accent pl-6 text-xl italic text-white/60">
-        "Sustainability is not a promise. It is a system."
-      </blockquote>
+      <div class="mt-16 flex items-center gap-6 border-l-2 border-accent pl-6">
+        <div class="h-16 w-16 shrink-0 text-accent">
+          <SketchStroke client:idle shape="ring" durationMs={1500} />
+        </div>
+        <blockquote class="text-xl italic text-white/60">
+          "Sustainability is not a promise. It is a system."
+        </blockquote>
+      </div>
     </ScrollReveal>
 
     <div class="mt-20 grid gap-4 md:grid-cols-3">
@@ -41,6 +54,18 @@ const pillars = [
         </ScrollReveal>
       ))}
     </div>
+
+    <ScrollReveal client:idle animation="fade-up" delay={200}>
+      <div class="mt-20 max-w-xl mx-auto text-white/80">
+        <p class="text-[11px] font-medium uppercase tracking-[2px] text-accent mb-4 text-center">IMPACT METRICS</p>
+        <DataScan
+          client:idle
+          rows={impactMetrics}
+          mono={true}
+          ariaLabel="platcoX sustainability impact metrics"
+        />
+      </div>
+    </ScrollReveal>
 
     <ScrollReveal client:idle animation="fade-in" delay={300}>
       <p class="mt-16 text-center text-white/40">

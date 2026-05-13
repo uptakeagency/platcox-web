@@ -1,6 +1,23 @@
 ---
 import ScrollReveal from "./motion/ScrollReveal";
 import DecisionEngineDemo from "./DecisionEngineDemo.tsx";
+import OntologyGraph from "./motion/primitives/OntologyGraph";
+
+// C.O.D.E akış grafı: Collect → Organize → Decide → Execute.
+// Section başlığıyla DecisionEngineDemo arasında konsept görseli sağlar.
+const codeFlow = {
+  nodes: [
+    { id: "c", x: 25, y: 60, label: "Collect", weight: 1 },
+    { id: "o", x: 80, y: 30, label: "Organize" },
+    { id: "d", x: 135, y: 60, label: "Decide" },
+    { id: "e", x: 185, y: 35, label: "Execute", weight: 1 },
+  ],
+  edges: [
+    { from: "c", to: "o" },
+    { from: "o", to: "d" },
+    { from: "d", to: "e" },
+  ],
+};
 ---
 
 <section id="decision-engine" class="section-padding bg-zinc-50/50">
@@ -16,6 +33,19 @@ import DecisionEngineDemo from "./DecisionEngineDemo.tsx";
             Global trade requires unparalleled visibility. Our proprietary Decision Engine (Live Tracking) integrates AI analytics, video feeds, and real-time operational data into a single pane of glass — giving you the power to optimize performance instantly from anywhere.
           </p>
         </div>
+      </div>
+    </ScrollReveal>
+
+    <ScrollReveal client:idle animation="fade-up" delay={100}>
+      <div class="mt-12 mx-auto max-w-2xl" style="color: #1A1A1A;">
+        <OntologyGraph
+          client:idle
+          nodes={codeFlow.nodes}
+          edges={codeFlow.edges}
+          alwaysShowLabels={true}
+          ariaLabel="C.O.D.E flow: Collect, Organize, Decide, Execute"
+          className="h-40 w-full"
+        />
       </div>
     </ScrollReveal>
 

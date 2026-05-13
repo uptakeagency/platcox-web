@@ -120,6 +120,23 @@ describe("OntologyGraph", () => {
     expect(circles[1].getAttribute("r")).toBe("8");
   });
 
+  // Phase 6 extra: alwaysShowLabels her node label'ını her zaman gösterir.
+  it("alwaysShowLabels=true renders a <text> label for every node up front", () => {
+    const { container } = render(
+      <OntologyGraph
+        {...sampleGraph}
+        alwaysShowLabels={true}
+        ariaLabel="labeled"
+      />,
+    );
+    const texts = container.querySelectorAll("text");
+    expect(texts.length).toBe(sampleGraph.nodes.length);
+    const labels = Array.from(texts).map((t) => t.textContent);
+    sampleGraph.nodes.forEach((n) => {
+      expect(labels).toContain(n.label);
+    });
+  });
+
   it("dangling edge (referencing a missing node) is skipped silently", () => {
     const graphWithDangling = {
       nodes: [{ id: "n1", x: 0, y: 0, label: "A" }],
