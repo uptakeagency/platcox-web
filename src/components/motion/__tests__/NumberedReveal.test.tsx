@@ -64,4 +64,11 @@ describe("NumberedReveal", () => {
     );
     expect(container.firstChild).toBeTruthy();
   });
+
+  // Codex P2 regresyon: num ve title span'leri arasında textContent separator.
+  it("inserts visible whitespace between num and title (textContent regression)", () => {
+    const { container } = render(<NumberedReveal items={sampleItems} />);
+    const items = container.querySelectorAll("li");
+    expect(items[0].textContent).toContain("/0.1 Strategy");
+  });
 });

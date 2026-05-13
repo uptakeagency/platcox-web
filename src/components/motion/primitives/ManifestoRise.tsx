@@ -36,11 +36,13 @@ export default function ManifestoRise({
         ref: ref as Ref<HTMLElement>,
         "aria-label": ariaLabel,
       },
-      lines.map((line, i) => (
+      lines.flatMap((line, i) => [
         <span key={i} style={{ display: "block" }}>
           {line}
-        </span>
-      )),
+        </span>,
+        // Adjacent span'leri textContent'te ayırmak için literal newline.
+        i < lines.length - 1 ? "\n" : null,
+      ]),
     );
   }
 
@@ -53,7 +55,7 @@ export default function ManifestoRise({
       ref: ref as Ref<HTMLElement>,
       "aria-label": ariaLabel,
     },
-    lines.map((line, i) => (
+    lines.flatMap((line, i) => [
       <motion.span
         key={i}
         style={{ display: "block" }}
@@ -70,7 +72,8 @@ export default function ManifestoRise({
         }}
       >
         {line}
-      </motion.span>
-    )),
+      </motion.span>,
+      i < lines.length - 1 ? "\n" : null,
+    ]),
   );
 }

@@ -51,4 +51,12 @@ describe("ManifestoRise (viewport-once)", () => {
     const spans = container.querySelectorAll("span");
     expect(spans.length).toBeGreaterThanOrEqual(lines.length);
   });
+
+  // Codex P2 regresyon: adjacent line span'leri textContent'te yapışmasın.
+  it("separates adjacent lines with whitespace in textContent", () => {
+    const { container } = render(<ManifestoRise lines={lines} />);
+    expect(container.textContent).not.toContain("TradeGets");
+    // Trade ve Gets arasında en az bir boşluk karakteri olmalı.
+    expect(container.textContent).toMatch(/Trade\s+Gets/);
+  });
 });

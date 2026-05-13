@@ -41,7 +41,7 @@ export default function NumberedReveal({
       >
         {items.map((item, i) => (
           <li key={i} aria-label={`${item.num} ${item.title}`}>
-            <span className="text-muted">{item.num}</span>
+            <span className="text-muted">{item.num}</span>{" "}
             <span>{item.title}</span>
             {item.description && <p>{item.description}</p>}
           </li>
@@ -76,7 +76,7 @@ export default function NumberedReveal({
             }}
             aria-label={`${item.num} ${item.title}`}
           >
-            <span className="text-muted">{item.num}</span>
+            <span className="text-muted">{item.num}</span>{" "}
             <span>{item.title}</span>
             {item.description && <p>{item.description}</p>}
           </motion.li>
