@@ -14,6 +14,7 @@ import TradeRoute from "../components/motion/primitives/TradeRoute";
 import SketchStroke from "../components/motion/primitives/SketchStroke";
 import NumberedReveal from "../components/motion/primitives/NumberedReveal";
 import ManifestoRise from "../components/motion/primitives/ManifestoRise";
+import TickCounter from "../components/motion/primitives/TickCounter";
 
 const numberedItems = [
   { num: "/0.1", title: "Strateji sonradan akla gelmiş bir şey değildir." },
@@ -122,6 +123,27 @@ const numberedItems = [
       <div style="width: 240px; color: #16a34a;">
         <SketchStroke client:load shape="arrow" />
       </div>
+    </section>
+
+    <section class="demo">
+      <h2>TickCounter — büyük sayı</h2>
+      <p style="font-size: 2rem; font-weight: 300;">
+        <TickCounter client:load target={240000} suffix="+" />
+      </p>
+    </section>
+
+    <section class="demo">
+      <h2>TickCounter — currency USD</h2>
+      <p style="font-size: 2rem; font-weight: 300;">
+        <TickCounter client:load target={1500000} format="currency" currency="USD" />
+      </p>
+    </section>
+
+    <section class="demo">
+      <h2>TickCounter — percent (2 ondalık)</h2>
+      <p style="font-size: 2rem; font-weight: 300;">
+        <TickCounter client:load target={0.4275} format="percent" precision={2} />
+      </p>
     </section>
 
     <section class="demo">
