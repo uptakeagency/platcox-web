@@ -42,10 +42,9 @@ export default function DataScan({
       <div
         ref={ref as RefObject<HTMLDivElement>}
         className={className}
-        aria-label={ariaLabel}
         style={rootStyle}
       >
-        <dl style={{ margin: 0 }}>
+        <dl style={{ margin: 0 }} aria-label={ariaLabel}>
           {rows.map((row, i) => (
             <div
               key={i}
@@ -70,10 +69,9 @@ export default function DataScan({
     <div
       ref={ref as RefObject<HTMLDivElement>}
       className={className}
-      aria-label={ariaLabel}
       style={rootStyle}
     >
-      <dl style={{ margin: 0 }}>
+      <dl style={{ margin: 0 }} aria-label={ariaLabel}>
         {rows.map((row, i) => {
           const transition = {
             duration: toFramerSeconds(durationMs),

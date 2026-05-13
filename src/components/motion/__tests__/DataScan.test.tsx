@@ -74,4 +74,25 @@ describe("DataScan", () => {
     expect(scanBar).toBeTruthy();
     expect(dl.contains(scanBar)).toBe(false);
   });
+
+  // Codex P2 (follow-up): ariaLabel actual <dl>'ye atfedilmeli (a11y contract),
+  // wrapper <div>'a değil. AT'ler description list üzerinde name bekler.
+  it("applies ariaLabel to the <dl> itself, not the wrapper", () => {
+    const { container } = render(
+      <DataScan rows={rows} ariaLabel="trade-routes" />,
+    );
+    const dl = container.querySelector("dl");
+    expect(dl?.getAttribute("aria-label")).toBe("trade-routes");
+    const wrapper = container.firstChild as HTMLElement;
+    expect(wrapper.getAttribute("aria-label")).toBeNull();
+  });
+
+  it("applies ariaLabel to <dl> in reduced-motion branch too", () => {
+    mockMatchMedia("(prefers-reduced-motion: reduce)", true);
+    const { container } = render(
+      <DataScan rows={rows} ariaLabel="trade-routes" />,
+    );
+    const dl = container.querySelector("dl");
+    expect(dl?.getAttribute("aria-label")).toBe("trade-routes");
+  });
 });
