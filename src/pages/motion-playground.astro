@@ -15,6 +15,7 @@ import SketchStroke from "../components/motion/primitives/SketchStroke";
 import NumberedReveal from "../components/motion/primitives/NumberedReveal";
 import ManifestoRise from "../components/motion/primitives/ManifestoRise";
 import TickCounter from "../components/motion/primitives/TickCounter";
+import DecisionPulse from "../components/motion/primitives/DecisionPulse";
 
 const numberedItems = [
   { num: "/0.1", title: "Strateji sonradan akla gelmiş bir şey değildir." },
@@ -122,6 +123,34 @@ const numberedItems = [
       <h2>SketchStroke — arrow</h2>
       <div style="width: 240px; color: #16a34a;">
         <SketchStroke client:load shape="arrow" />
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>DecisionPulse — uptrend (kar amaçlı)</h2>
+      <div style="width: 360px;">
+        <DecisionPulse client:load title="Stock-out riski" value="+12%" trend="up" />
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>DecisionPulse — downtrend (uyarı)</h2>
+      <div style="width: 360px;">
+        <DecisionPulse client:load title="Marj erozyonu" value="-3.4%" trend="down" />
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>DecisionPulse — pulse=false (statik)</h2>
+      <div style="width: 360px;">
+        <DecisionPulse client:load title="Pulse yok" value="—" pulse={false} />
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>DecisionPulse — neutral trend</h2>
+      <div style="width: 360px;">
+        <DecisionPulse client:load title="Yatay seyir" value="0.0%" trend="neutral" />
       </div>
     </section>
 

@@ -2,6 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Motion library keyframes — DecisionPulse pulse-ring vb. */
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 currentColor;
+  }
+  100% {
+    box-shadow: 0 0 0 14px transparent;
+  }
+}
+
 @layer base {
   body {
     @apply bg-bg text-foreground font-sans antialiased;
