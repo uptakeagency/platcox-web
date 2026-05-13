@@ -22,6 +22,22 @@ const locations: Location[] = [
   { id: "saopaulo", city: "São Paulo", country: "Brazil", type: "Partner", x: 30, y: 62 },
 ];
 
+// HQ-merkezli ticaret rotaları (Phase 6 Task 6.2 — TradeRoute integration).
+// Inline SMIL pattern: TradeRoute primitive'inin scaled versiyonu, WorldMap
+// SVG viewBox'ına (1000x500) absolute koordinatlarla çiziliyor.
+const routes: Array<{ from: string; to: string }> = [
+  { from: "istanbul", to: "london" },
+  { from: "istanbul", to: "newyork" },
+  { from: "istanbul", to: "shanghai" },
+  { from: "istanbul", to: "mumbai" },
+  { from: "istanbul", to: "dubai" },
+  { from: "istanbul", to: "dhaka" },
+  { from: "istanbul", to: "nairobi" },
+  { from: "istanbul", to: "saopaulo" },
+];
+
+const locationsById = new Map(locations.map((l) => [l.id, l]));
+
 export default function WorldMap() {
   const [active, setActive] = useState<string | null>(null);
 
@@ -35,6 +51,51 @@ export default function WorldMap() {
         <path d="M460,200 Q520,190 560,220 Q580,280 560,320 Q520,340 480,310 Q460,260 460,200Z" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.1)" strokeWidth="0.5" />
         <path d="M580,150 Q650,120 720,140 Q750,180 740,220 Q700,240 660,220 Q620,200 580,150Z" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.1)" strokeWidth="0.5" />
         <path d="M740,160 Q800,140 860,160 Q880,200 860,240 Q820,260 780,240 Q750,210 740,160Z" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.1)" strokeWidth="0.5" />
+
+        {/* Trade routes — TradeRoute primitive paterni inline (Phase 6 Task 6.2).
+            Page-level motion observer (BaseLayout) viewport'a girince
+            beginElement() ile animate'ı tetikler. */}
+        {routes.map((route, i) => {
+          const from = locationsById.get(route.from);
+          const to = locationsById.get(route.to);
+          if (!from || !to) return null;
+          // Yüzde koordinatları SVG viewBox birimlerine (1000x500).
+          const fx = from.x * 10;
+          const fy = from.y * 5;
+          const tx = to.x * 10;
+          const ty = to.y * 5;
+          const cx = (fx + tx) / 2;
+          const cy = Math.min(fy, ty) - Math.abs(tx - fx) * 0.18;
+          return (
+            <g
+              key={`route-${route.from}-${route.to}`}
+              data-motion-trigger="viewport-once"
+              data-motion-reduced-end-state
+            >
+              <path
+                d={`M ${fx} ${fy} Q ${cx} ${cy} ${tx} ${ty}`}
+                fill="none"
+                stroke="#22C55E"
+                strokeOpacity={0.35}
+                strokeWidth="1"
+                pathLength="1"
+                strokeDasharray="1"
+                strokeDashoffset="1"
+              >
+                <animate
+                  attributeName="stroke-dashoffset"
+                  from="1"
+                  to="0"
+                  dur="1200ms"
+                  keySplines="0.65 0 0.35 1"
+                  calcMode="spline"
+                  fill="freeze"
+                  begin={`indefinite; ${i * 200}ms`}
+                />
+              </path>
+            </g>
+          );
+        })}
       </svg>
 
       {locations.map((loc, i) => (
