@@ -2,6 +2,10 @@ import { motion } from "framer-motion";
 import { createElement, type Ref } from "react";
 import { useReducedMotion } from "../hooks/useReducedMotion";
 import { useInViewport } from "../hooks/useInViewport";
+import {
+  useScrollProgress,
+  type ScrollAdapter,
+} from "../hooks/useScrollProgress";
 import { toFramerSeconds } from "../adapters/framer";
 import { DURATION, EASE } from "../tokens";
 import type { BaseReactProps } from "../types";
@@ -10,6 +14,9 @@ export interface ManifestoRiseProps extends BaseReactProps {
   lines: string[];
   staggerDelay?: number; // satırlar arası gecikme, ms
   as?: "h1" | "h2" | "h3" | "div";
+  trigger?: "viewport-once" | "scroll-progress";
+  sectionId?: string; // scroll-progress için target element id'si
+  scrollAdapter?: ScrollAdapter | null; // GSAP-aware scroll provider (örn. Lenis)
 }
 
 // Manifesto satırlarını sırayla yükselterek ortaya çıkarır.
@@ -21,11 +28,28 @@ export default function ManifestoRise({
   staggerDelay = 150,
   durationMs = DURATION.long,
   as = "h1",
+  trigger = "viewport-once",
+  sectionId,
+  scrollAdapter = null,
   className,
   ariaLabel,
 }: ManifestoRiseProps) {
   const reduced = useReducedMotion();
   const { ref, isInView } = useInViewport({ threshold: 0.3, once: true });
+
+  // Phase 5 Task 5.3: scroll-progress variant.
+  // Hooks rule: koşullu çağıramayız → useScrollProgress'i her zaman çağırıp
+  // disabled flag ile gate'liyoruz. reduced-motion veya farklı trigger'da no-op.
+  const isScrollMode = trigger === "scroll-progress";
+  useScrollProgress({
+    triggerSelector: sectionId
+      ? `#${sectionId}`
+      : "__manifesto-noop__",
+    pinDistanceDesktop: "+=150%",
+    pinDistanceMobile: "+=100%",
+    disabled: !isScrollMode || reduced || !sectionId,
+    adapter: scrollAdapter,
+  });
 
   // Reduced-motion: framer-motion bypass, plain heading
   if (reduced) {
