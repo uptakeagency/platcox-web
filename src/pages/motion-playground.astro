@@ -12,6 +12,13 @@ if (import.meta.env.PROD) {
 import BaseLayout from "../layouts/BaseLayout.astro";
 import TradeRoute from "../components/motion/primitives/TradeRoute";
 import SketchStroke from "../components/motion/primitives/SketchStroke";
+import NumberedReveal from "../components/motion/primitives/NumberedReveal";
+
+const numberedItems = [
+  { num: "/0.1", title: "Strateji sonradan akla gelmiş bir şey değildir." },
+  { num: "/0.2", title: "Operasyonlar niyetle nefes alır." },
+  { num: "/0.3", title: "Sayılar yerini hak eder." },
+];
 ---
 
 <html lang="tr">
@@ -114,6 +121,16 @@ import SketchStroke from "../components/motion/primitives/SketchStroke";
       <div style="width: 240px; color: #16a34a;">
         <SketchStroke client:load shape="arrow" />
       </div>
+    </section>
+
+    <section class="demo">
+      <h2>NumberedReveal — default stagger (120ms)</h2>
+      <NumberedReveal client:load items={numberedItems} />
+    </section>
+
+    <section class="demo">
+      <h2>NumberedReveal — yavaş stagger (400ms)</h2>
+      <NumberedReveal client:load items={numberedItems} staggerDelay={400} />
     </section>
 
     <section class="demo">
