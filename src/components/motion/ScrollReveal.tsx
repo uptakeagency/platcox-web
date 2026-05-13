@@ -1,5 +1,5 @@
 import { motion, type Variant } from "framer-motion";
-import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
+import { useEffect, useState, type ReactNode, type RefObject } from "react";
 import { useReducedMotion } from "./hooks/useReducedMotion";
 import { useInViewport } from "./hooks/useInViewport";
 import { toFramerSeconds } from "./adapters/framer";
@@ -31,10 +31,14 @@ const variants: Record<AnimationType, { hidden: Variant; visible: Variant }> = {
   "split-right": { hidden: { opacity: 0, x: 80 },     visible: { opacity: 1, x: 0 } },
 };
 
-// SSR-visible kontrat (spec §5.2.2): HTML her zaman end-state ile basılır.
-// Animation yalnızca client-side hydrate sonrası, ilk viewport-girişinde
-// tetiklenir; mount anında zaten ekranda olan içerik animate edilmez
-// (sayfa açılışındaki sıçramayı önler).
+// SSR-visible kontrat (spec §5.2.2): SSR HTML her zaman end-state ile basılır
+// (plain <div>, opacity:0 inline stili yok). Hydration sonrası motion.div'e
+// geçilir; useInViewport observer'ı element viewport'a girdiğinde animation
+// pipeline'ını tetikler.
+//
+// Codex P1 (Task 0.14 follow-up): Astro `client:visible` ile mount edilen
+// componentler zaten viewport içindedir; `initialInView` mount-time check'i
+// kaldırıldı çünkü her zaman true dönüyordu → motion.div'e hiç geçemiyorduk.
 export default function ScrollReveal({
   children,
   animation = "fade-up",
@@ -46,19 +50,14 @@ export default function ScrollReveal({
   const reduced = useReducedMotion();
   const { ref, isInView } = useInViewport({ threshold: 0.2, once: true });
   const [hydrated, setHydrated] = useState(false);
-  const initialInView = useRef(false);
 
   useEffect(() => {
     setHydrated(true);
-    if (ref.current) {
-      const rect = ref.current.getBoundingClientRect();
-      initialInView.current = rect.top < window.innerHeight && rect.bottom > 0;
-    }
-  }, [ref]);
+  }, []);
 
-  // SSR + henüz hydrate olmamış + reduced-motion + mount anında zaten görünür
-  // durumlarda animation pipeline'ı bypass → plain div, end-state.
-  if (!hydrated || reduced || initialInView.current) {
+  // SSR + henüz hydrate olmamış + reduced-motion durumlarda
+  // animation pipeline'ı bypass → plain div, end-state.
+  if (!hydrated || reduced) {
     return (
       <div ref={ref as RefObject<HTMLDivElement>} className={className}>
         {children}
