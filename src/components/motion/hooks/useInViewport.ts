@@ -22,14 +22,26 @@ interface PooledObserver {
 // Aynı (threshold, rootMargin, root) anahtarına sahip tüm hook'lar tek bir IO paylaşır.
 const pools = new Map<string, PooledObserver>();
 
+// Custom root element'leri için stabil unique id (WeakMap → root GC olunca eşleşme düşer).
+let nextRootId = 0;
+const rootIds = new WeakMap<Element, number>();
+const idForRoot = (root: Element | null): string => {
+  if (!root) return "window";
+  let id = rootIds.get(root);
+  if (id === undefined) {
+    id = ++nextRootId;
+    rootIds.set(root, id);
+  }
+  return `r${id}`;
+};
+
 // Test-only: pool state'ini sıfırla (modül-level singleton, test izolasyonu için).
 export function __resetPoolsForTesting() {
   for (const pool of pools.values()) pool.observer.disconnect();
   pools.clear();
 }
 
-const keyFor = (k: PoolKey) =>
-  `${k.threshold}|${k.rootMargin}|${k.root ? "custom" : "window"}`;
+const keyFor = (k: PoolKey) => `${k.threshold}|${k.rootMargin}|${idForRoot(k.root)}`;
 
 function getPool(k: PoolKey): PooledObserver {
   const id = keyFor(k);
@@ -67,7 +79,7 @@ export function useInViewport(opts: Options = {}) {
   const [isInView, setIsInView] = useState(false);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === "undefined" || typeof IntersectionObserver !== "function") return;
     const el = ref.current;
     if (!el) return;
 

@@ -5,6 +5,7 @@ export interface MockIO {
   disconnect: ReturnType<typeof spyOn>;
   observe: ReturnType<typeof spyOn>;
   unobserve: ReturnType<typeof spyOn>;
+  getInstanceCount: () => number;
 }
 
 export function mockIntersectionObserver(): MockIO {
@@ -48,5 +49,6 @@ export function mockIntersectionObserver(): MockIO {
     disconnect: spyOn(ObserverMock.prototype, "disconnect"),
     observe: spyOn(ObserverMock.prototype, "observe"),
     unobserve: spyOn(ObserverMock.prototype, "unobserve"),
+    getInstanceCount: () => callbacks.length,
   };
 }
