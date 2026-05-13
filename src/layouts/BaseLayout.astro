@@ -175,8 +175,11 @@ const jsonLd = {
         [data-motion-trigger] animateMotion {
           animation-play-state: paused;
         }
-        /* Primitive'ler reduced-motion'da end-state'i sabitlemek için bu attribute'ı kullanır. */
-        [data-motion-reduced-end-state] {
+        /* Primitive'ler reduced-motion'da end-state'i sabitlemek için bu attribute'ı kullanır.
+           Child elementlere de (örn. SVG <path>) inheritance yerine doğrudan uygulanır,
+           çünkü presentation attribute'ları (stroke-dashoffset="1") inherited CSS'ten önce gelir. */
+        [data-motion-reduced-end-state],
+        [data-motion-reduced-end-state] * {
           stroke-dashoffset: 0 !important;
         }
       }
