@@ -22,6 +22,9 @@ export interface TickCounterProps extends BaseReactProps {
 }
 
 // Intl.NumberFormat ile formatlı sayıyı locale + format'a göre döndürür.
+// format="currency" + currency yok → Intl throw etmesin diye decimal'a düşer
+// (Codex P2 fix; warning dev'de tek seferlik).
+let warnedNoCurrency = false;
 function formatValue(
   v: number,
   format: "number" | "currency" | "percent",
@@ -29,14 +32,24 @@ function formatValue(
   currency: string | undefined,
   precision: number | undefined,
 ): string {
-  const defaults = format === "percent" ? 0 : 0;
-  const fractionDigits = precision ?? defaults;
+  let effectiveFormat = format;
+  if (format === "currency" && !currency) {
+    if (!warnedNoCurrency && typeof console !== "undefined") {
+      // eslint-disable-next-line no-console
+      console.warn(
+        "TickCounter: format=\"currency\" verildi ama currency prop'u yok — decimal'a düşülüyor.",
+      );
+      warnedNoCurrency = true;
+    }
+    effectiveFormat = "number";
+  }
+  const fractionDigits = precision ?? 0;
   const opts: Intl.NumberFormatOptions = {
-    style: format === "number" ? "decimal" : format,
+    style: effectiveFormat === "number" ? "decimal" : effectiveFormat,
     minimumFractionDigits: fractionDigits,
     maximumFractionDigits: fractionDigits,
   };
-  if (format === "currency") opts.currency = currency;
+  if (effectiveFormat === "currency") opts.currency = currency;
   return new Intl.NumberFormat(locale, opts).format(v);
 }
 

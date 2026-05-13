@@ -80,4 +80,12 @@ describe("TickCounter", () => {
     const span = container.querySelector("span") as HTMLSpanElement;
     expect(span.style.fontVariantNumeric).toBe("tabular-nums");
   });
+
+  // Codex P2: format=currency + currency eksik → Intl throw etmemeli, plain'e düşmeli.
+  it("does not throw when format='currency' is used without a currency code", () => {
+    expect(() => {
+      const html = renderToString(<TickCounter target={1500} format="currency" />);
+      expect(html).toContain("1,500");
+    }).not.toThrow();
+  });
 });
