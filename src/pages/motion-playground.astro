@@ -1,12 +1,9 @@
 ---
 // Dev-only motion library playground.
 // Phase 0 Gate B kararı: v1'de Storybook yok, primitive demo'ları burada toplanır.
-//
-// Production erişimi: route public ama astro.config.mjs içinde sitemap.xml'den
-// hariç tutuluyor (Task 0.15 P3 fix). Önceki top-level `if (PROD) return` guard'ı
-// esbuild parse hatasına ("Unterminated string literal") neden olduğu için
-// kaldırıldı; production crawler'ları sitemap üzerinden bu URL'i göremez.
-
+// BaseLayout sarmalı — page-level motion observer (BaseLayout body script'i)
+// SMIL primitive'lerin begin="indefinite" animate'lerini tetikler.
+import BaseLayout from "../layouts/BaseLayout.astro";
 import TradeRoute from "../components/motion/primitives/TradeRoute";
 import SketchStroke from "../components/motion/primitives/SketchStroke";
 import NumberedReveal from "../components/motion/primitives/NumberedReveal";
@@ -56,57 +53,11 @@ const numberedItems = [
 ];
 ---
 
-<html lang="tr">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Motion Library Playground (dev)</title>
-    <style>
-      :root {
-        color-scheme: light dark;
-      }
-      body {
-        font-family: Inter, system-ui, sans-serif;
-        padding: 40px;
-        background: #fafafa;
-        color: #111;
-        margin: 0;
-        line-height: 1.5;
-      }
-      h1 {
-        font-weight: 300;
-        font-size: 2rem;
-        margin: 0 0 8px;
-      }
-      .meta {
-        font-size: 0.875rem;
-        color: #6b7280;
-        margin-bottom: 32px;
-      }
-      .demo {
-        padding: 24px;
-        border: 1px solid #e5e7eb;
-        margin-bottom: 16px;
-        background: #fff;
-        border-radius: 6px;
-      }
-      .demo h2 {
-        font-weight: 500;
-        font-size: 1rem;
-        margin: 0 0 12px;
-        letter-spacing: -0.01em;
-      }
-      .empty {
-        color: #9ca3af;
-        font-style: italic;
-      }
-    </style>
-  </head>
-  <body>
+<BaseLayout title="Motion Library Playground (dev)" description="Motion library primitive demo sayfası — dev-only.">
+  <main class="playground">
     <h1>Motion Library Playground</h1>
     <p class="meta">
-      Dev-only sayfa — production build'e dahil değildir (Astro <code>_</code> prefix kuralı).
-      Primitive'ler Phase 1-5'te eklendikçe buraya birer demo bloğu olarak gelir.
+      Dev-only sayfa. Production'da route public ama sitemap'ten hariç. Tüm primitive'ler aşağıda demo'lanır.
     </p>
 
     <section class="demo">
@@ -155,6 +106,13 @@ const numberedItems = [
       <h2>SketchStroke — arrow</h2>
       <div style="width: 240px; color: #16a34a;">
         <SketchStroke client:load shape="arrow" />
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>SketchStroke — custom (üçgen)</h2>
+      <div style="width: 240px; color: #db2777;">
+        <SketchStroke client:load shape="custom" path="M 10 80 L 60 20 L 110 80 Z" durationMs={1500} />
       </div>
     </section>
 
@@ -257,12 +215,38 @@ const numberedItems = [
       <h2>NumberedReveal — yavaş stagger (400ms)</h2>
       <NumberedReveal client:load items={numberedItems} staggerDelay={400} />
     </section>
+  </main>
+</BaseLayout>
 
-    <section class="demo">
-      <h2>SketchStroke — custom (üçgen)</h2>
-      <div style="width: 240px; color: #db2777;">
-        <SketchStroke client:load shape="custom" path="M 10 80 L 60 20 L 110 80 Z" durationMs={1500} />
-      </div>
-    </section>
-  </body>
-</html>
+<style>
+  .playground {
+    font-family: Inter, system-ui, sans-serif;
+    padding: 40px;
+    background: #fafafa;
+    color: #111;
+    min-height: 100vh;
+  }
+  .playground h1 {
+    font-weight: 300;
+    font-size: 2rem;
+    margin: 0 0 8px;
+  }
+  .playground .meta {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-bottom: 32px;
+  }
+  .playground .demo {
+    padding: 24px;
+    border: 1px solid #e5e7eb;
+    margin-bottom: 16px;
+    background: #fff;
+    border-radius: 6px;
+  }
+  .playground .demo h2 {
+    font-weight: 500;
+    font-size: 1rem;
+    margin: 0 0 12px;
+    letter-spacing: -0.01em;
+  }
+</style>
