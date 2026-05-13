@@ -1,13 +1,11 @@
 ---
 // Dev-only motion library playground.
 // Phase 0 Gate B kararı: v1'de Storybook yok, primitive demo'ları burada toplanır.
-// Phase 1+ task'larında her primitive ekleyince bu sayfaya bir <section> eklenir.
 //
-// Codex P2 (Task 0.15): "_" prefix astro dev'de de 404 verdiği için kaldırıldı.
-// Production erişimi runtime guard ile kapatılıyor.
-if (import.meta.env.PROD) {
-  return new Response(null, { status: 404 });
-}
+// Production erişimi: route public ama astro.config.mjs içinde sitemap.xml'den
+// hariç tutuluyor (Task 0.15 P3 fix). Önceki top-level `if (PROD) return` guard'ı
+// esbuild parse hatasına ("Unterminated string literal") neden olduğu için
+// kaldırıldı; production crawler'ları sitemap üzerinden bu URL'i göremez.
 
 import TradeRoute from "../components/motion/primitives/TradeRoute";
 import SketchStroke from "../components/motion/primitives/SketchStroke";
