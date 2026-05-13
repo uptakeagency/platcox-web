@@ -1,5 +1,6 @@
 ---
 import ScrollReveal from "./motion/ScrollReveal";
+import TickCounter from "./motion/primitives/TickCounter";
 
 const principles = [
   { title: "DISCIPLINE", description: "Precision logistics and operations, executed quietly." },
@@ -10,12 +11,28 @@ const principles = [
 
 <section id="philosophy" class="section-padding">
   <div class="container-content">
-    <ScrollReveal client:idle animation="fade-up">
-      <p class="section-label">OUR PHILOSOPHY</p>
-      <h2 class="text-3xl font-light tracking-tight md:text-5xl">
-        Principles that move markets.
-      </h2>
-    </ScrollReveal>
+    <div class="grid gap-12 md:grid-cols-2 md:items-end">
+      <ScrollReveal client:idle animation="fade-up">
+        <p class="section-label">OUR PHILOSOPHY</p>
+        <h2 class="text-3xl font-light tracking-tight md:text-5xl">
+          Principles that move markets.
+        </h2>
+      </ScrollReveal>
+
+      <ScrollReveal client:idle animation="fade-up" delay={100}>
+        <div class="md:text-right">
+          <p class="text-[11px] font-medium uppercase tracking-[2px] text-muted mb-2">
+            YEARS IN OPERATION
+          </p>
+          <p class="text-6xl font-light leading-none text-foreground md:text-7xl">
+            <TickCounter client:load target={15} suffix="+" durationMs={2400} />
+          </p>
+          <p class="mt-2 text-sm text-muted">
+            Sessiz çalışan disiplin, 15 yıllık birikim.
+          </p>
+        </div>
+      </ScrollReveal>
+    </div>
 
     <div class="mt-20 grid gap-4 md:grid-cols-3">
       {principles.map((p, i) => (
