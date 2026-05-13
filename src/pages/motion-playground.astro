@@ -9,7 +9,6 @@ if (import.meta.env.PROD) {
   return new Response(null, { status: 404 });
 }
 
-import BaseLayout from "../layouts/BaseLayout.astro";
 import TradeRoute from "../components/motion/primitives/TradeRoute";
 import SketchStroke from "../components/motion/primitives/SketchStroke";
 import NumberedReveal from "../components/motion/primitives/NumberedReveal";
@@ -17,6 +16,34 @@ import ManifestoRise from "../components/motion/primitives/ManifestoRise";
 import TickCounter from "../components/motion/primitives/TickCounter";
 import DecisionPulse from "../components/motion/primitives/DecisionPulse";
 import DataScan from "../components/motion/primitives/DataScan";
+import OntologyGraph from "../components/motion/primitives/OntologyGraph";
+
+const codeGraph = {
+  nodes: [
+    { id: "a", x: 30, y: 40, label: "Data" },
+    { id: "b", x: 80, y: 60, label: "Ontology" },
+    { id: "c", x: 130, y: 30, label: "Decision" },
+    { id: "d", x: 170, y: 70, label: "Action" },
+  ],
+  edges: [
+    { from: "a", to: "b" },
+    { from: "b", to: "c" },
+    { from: "b", to: "d" },
+    { from: "c", to: "d" },
+  ],
+};
+
+const simpleGraph = {
+  nodes: [
+    { id: "n1", x: 50, y: 40, label: "Sourcing" },
+    { id: "n2", x: 100, y: 60, label: "Strategy" },
+    { id: "n3", x: 160, y: 30, label: "Operations" },
+  ],
+  edges: [
+    { from: "n1", to: "n2" },
+    { from: "n2", to: "n3" },
+  ],
+};
 
 const dataScanRows = [
   { label: "Karachi → Rotterdam", value: "14g" },
@@ -131,6 +158,23 @@ const numberedItems = [
       <div style="width: 240px; color: #16a34a;">
         <SketchStroke client:load shape="arrow" />
       </div>
+    </section>
+
+    <section class="demo">
+      <h2>OntologyGraph — Sourcing → Strategy → Operations (basit)</h2>
+      <div style="width: 480px; color: #111;">
+        <OntologyGraph client:load {...simpleGraph} ariaLabel="Sourcing to Strategy to Operations" />
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>OntologyGraph — C.O.D.E akışı (yoğun)</h2>
+      <div style="width: 480px; color: #2563eb;">
+        <OntologyGraph client:load {...codeGraph} ariaLabel="C.O.D.E flow" />
+      </div>
+      <p style="margin-top: 8px; font-size: 0.75rem; color: #6b7280;">
+        Tab ile node'lar arasında gez; Enter/Space ile detayı aç; Esc kapatır.
+      </p>
     </section>
 
     <section class="demo">

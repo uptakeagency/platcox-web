@@ -21,6 +21,30 @@
   }
 }
 
+@keyframes ontology-breath {
+  0%,
+  100% {
+    r: 4;
+  }
+  50% {
+    r: 5;
+  }
+}
+
+@keyframes ontology-edge-flow {
+  to {
+    stroke-dashoffset: -5;
+  }
+}
+
+[data-ontology-node] {
+  animation: ontology-breath 3s ease-in-out infinite;
+}
+
+[data-ontology-edge] {
+  animation: ontology-edge-flow 2.5s linear infinite;
+}
+
 @layer base {
   body {
     @apply bg-bg text-foreground font-sans antialiased;
