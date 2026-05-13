@@ -15,6 +15,8 @@ Object.assign(globalThis, {
   window: dom.window,
   document: dom.window.document,
   navigator: dom.window.navigator,
+  // lenis'in `instanceof Window` kontrolü için global Window constructor.
+  Window: dom.window.Window,
   HTMLElement: dom.window.HTMLElement,
   HTMLDivElement: dom.window.HTMLDivElement,
   Element: dom.window.Element,
@@ -32,4 +34,25 @@ Object.assign(globalThis, {
     unobserve() {}
     disconnect() {}
   },
+  // lenis Dimensions sınıfı autoResize true iken ResizeObserver çağırır.
+  ResizeObserver: class ResizeObserver {
+    constructor(_cb: any) {}
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  },
+});
+
+// Phase 5'te eklenecek GSAP ScrollTrigger gibi modül yüklemesinde
+// matchMedia'ya dokunan kütüphaneler için default stub. Her test
+// gerektiğinde window.matchMedia'yı override edebilir.
+(dom.window as any).matchMedia = (q: string) => ({
+  matches: false,
+  media: q,
+  onchange: null,
+  addEventListener: () => {},
+  removeEventListener: () => {},
+  addListener: () => {},
+  removeListener: () => {},
+  dispatchEvent: () => false,
 });
