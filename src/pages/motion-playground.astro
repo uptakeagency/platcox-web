@@ -8,6 +8,9 @@
 if (import.meta.env.PROD) {
   return new Response(null, { status: 404 });
 }
+
+import BaseLayout from "../layouts/BaseLayout.astro";
+import TradeRoute from "../components/motion/primitives/TradeRoute";
 ---
 
 <html lang="tr">
@@ -64,8 +67,36 @@ if (import.meta.env.PROD) {
     </p>
 
     <section class="demo">
-      <h2>Primitives</h2>
-      <p class="empty">Henüz primitive yok. Phase 1: TradeRoute, SketchStroke.</p>
+      <h2>TradeRoute — default (viewport-once)</h2>
+      <div style="width: 400px; color: #111;">
+        <TradeRoute client:load from={{ x: 20, y: 80 }} to={{ x: 180, y: 20 }} ariaLabel="Demo trade route" />
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>TradeRoute — yüksek curve</h2>
+      <div style="width: 400px; color: #2563eb;">
+        <TradeRoute client:load from={{ x: 20, y: 80 }} to={{ x: 180, y: 20 }} curve={0.8} />
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>TradeRoute — manual trigger</h2>
+      <div style="width: 400px; color: #16a34a;">
+        <TradeRoute client:load from={{ x: 20, y: 80 }} to={{ x: 180, y: 20 }} trigger="manual" id="demo-route" />
+      </div>
+      <button
+        type="button"
+        onclick="window.__motionTrigger && window.__motionTrigger('demo-route')"
+        style="margin-top: 8px; padding: 6px 12px; cursor: pointer;"
+      >
+        Trigger
+      </button>
+    </section>
+
+    <section class="demo">
+      <h2>SketchStroke</h2>
+      <p class="empty">Task 1.2'de eklenecek.</p>
     </section>
   </body>
 </html>
