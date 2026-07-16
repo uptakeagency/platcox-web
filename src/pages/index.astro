@@ -1,36 +1,39 @@
 ---
-import BaseLayout from "../layouts/BaseLayout.astro";
-import Header from "../components/Header.astro";
-import HeroSection from "../components/HeroSection.astro";
-import AboutSection from "../components/AboutSection.astro";
-import PhilosophySection from "../components/PhilosophySection.astro";
-import SolutionsSection from "../components/SolutionsSection.astro";
-import DecisionEngineSection from "../components/DecisionEngineSection.astro";
-import ClientsWhySection from "../components/ClientsWhySection.astro";
-import SustainabilitySection from "../components/SustainabilitySection.astro";
-import TestimonialsSection from "../components/TestimonialsSection.astro";
-import NewsSection from "../components/NewsSection.astro";
-import ContactSection from "../components/ContactSection.astro";
-import LocationsSection from "../components/LocationsSection.astro";
-import DualCTA from "../components/DualCTA.astro";
-import Footer from "../components/Footer.astro";
+import BusinessCardLayout from "../layouts/BusinessCardLayout.astro";
 ---
-
-<BaseLayout>
-  <Header />
-  <main>
-    <HeroSection />
-    <AboutSection />
-    <PhilosophySection />
-    <SolutionsSection />
-    <DecisionEngineSection />
-    <ClientsWhySection />
-    <SustainabilitySection />
-    <TestimonialsSection />
-    <NewsSection />
-    <ContactSection />
-    <LocationsSection />
-    <DualCTA />
+<BusinessCardLayout>
+  <main class="card">
+    <div class="center">
+      <div class="mark rise d1">platco<span class="x">x</span></div>
+      <h1 class="mission rise d2">
+        Organize global trade and make products accessible anywhere in the world<span class="dot">.</span>
+      </h1>
+      <a class="cta rise d3" href="mailto:info@platcox.com">info@platcox.com</a>
+    </div>
   </main>
-  <Footer />
-</BaseLayout>
+
+  <style>
+    .card {
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
+      padding: clamp(28px, 5vw, 72px) clamp(28px, 5vw, 72px) 90px;
+    }
+    .center { display: flex; flex-direction: column; align-items: center; gap: clamp(30px, 5vh, 56px); max-width: 900px; }
+    .mark { font-weight: 600; letter-spacing: -0.02em; font-size: clamp(22px, 2.4vw, 30px); }
+    .mark .x { color: #22C55E; }
+    .mission { font-weight: 300; letter-spacing: -0.025em; line-height: 1.1; font-size: clamp(28px, 4.4vw, 60px); max-width: 20ch; }
+    .mission .dot { color: #22C55E; }
+    .cta {
+      text-decoration: none; font-weight: 500; font-size: clamp(15px, 1.5vw, 19px);
+      border-bottom: 1px solid rgba(0,0,0,.25); padding-bottom: 2px;
+    }
+    .cta:focus-visible { outline: 2px solid #22C55E; outline-offset: 4px; }
+
+    @keyframes rise { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: none; } }
+    .rise { animation: rise 1s cubic-bezier(.2,.7,.2,1) both; }
+    .rise.d1 { animation-delay: .15s; } .rise.d2 { animation-delay: .5s; } .rise.d3 { animation-delay: .85s; }
+    @media (prefers-reduced-motion: reduce) { .rise { animation: none; } }
+  </style>
+</BusinessCardLayout>
