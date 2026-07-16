@@ -7,6 +7,7 @@ import "../styles/card-reset.css";
 interface Props { title: string; description: string }
 const { title, description } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImageURL = new URL("/og-default.png", Astro.site);
 ---
 <!doctype html>
 <html lang="en">
@@ -20,6 +21,11 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical.href} />
+    <meta property="og:image" content={ogImageURL.href} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageURL.href} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   </head>
   <body>
