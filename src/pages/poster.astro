@@ -1,0 +1,266 @@
+---
+import logoImg from '../assets/platcox-logo.png';
+---
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Platcox A2 Poster</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+      :root {
+         /* A2 size in mm */
+         --poster-width: 420mm;
+         --poster-height: 594mm;
+      }
+      
+      body {
+        margin: 0;
+        padding: 60px 0;
+        background: #F3F4F6;
+        font-family: 'Inter', sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        min-height: 100vh;
+        overflow-x: hidden;
+        overflow-y: auto;
+        box-sizing: border-box;
+      }
+      
+      #scale-wrapper {
+        position: relative;
+        /* Width and Height will be injected by JS */
+      }
+
+      .poster-container {
+        /* Define baseline physical dimensions at 96 DPI for accuracy */
+        width: 1587px;  
+        height: 2245px; 
+        background-color: #FAFAFA;
+        color: #1A1A1A;
+        position: absolute;
+        top: 0;
+        left: 0;
+        transform-origin: top left;
+        overflow: hidden;
+        box-sizing: border-box;
+        box-shadow: 0 0 40px rgba(0,0,0,0.8);
+      }
+      
+      .logo-area {
+        position: absolute;
+        top: 150px;
+        left: 150px;
+      }
+      
+      .logo-text {
+        font-size: 80px;
+        font-weight: 600;
+        letter-spacing: -2px;
+        color: #1A1A1A;
+      }
+      .logo-text span {
+        color: #22C55E;
+      }
+
+      .content-area {
+        position: absolute;
+        top: 600px;
+        left: 150px;
+        right: 150px;
+        z-index: 10;
+      }
+
+      .headline {
+        font-size: 160px;
+        font-weight: 300;
+        line-height: 1.05;
+        letter-spacing: -4px;
+        margin: 0 0 60px 0;
+      }
+      .headline span {
+        font-weight: 600;
+      }
+
+      .subtitle {
+        font-size: 50px;
+        color: #666666;
+        font-weight: 400;
+        max-width: 1100px;
+        line-height: 1.4;
+        margin: 0;
+      }
+
+      .features {
+        position: absolute;
+        top: 1400px;
+        left: 150px;
+        display: flex;
+        flex-direction: column;
+        gap: 50px;
+        z-index: 10;
+      }
+
+      .feature-item {
+        font-size: 55px;
+        color: #1A1A1A;
+        display: flex;
+        align-items: center;
+        gap: 30px;
+      }
+
+      .feature-item::before {
+        content: "";
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        background-color: #22C55E;
+        border-radius: 50%;
+      }
+
+      .bg-decor {
+        position: absolute;
+        z-index: 1;
+        opacity: 0.1;
+      }
+      .circle-1 {
+        width: 1200px;
+        height: 1200px;
+        border: 4px solid #22C55E;
+        border-radius: 50%;
+        top: -200px;
+        right: -200px;
+      }
+      .circle-2 {
+        width: 2400px;
+        height: 2400px;
+        border: 2px solid rgba(26, 26, 26, 0.05);
+        border-radius: 50%;
+        bottom: -800px;
+        left: -600px;
+      }
+
+      .contact-banner {
+        position: absolute;
+        bottom: 150px;
+        left: 150px;
+        right: 150px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        border-top: 2px solid rgba(26, 26, 26, 0.1);
+        padding-top: 60px;
+        z-index: 10;
+      }
+      .slogan {
+        font-size: 40px;
+        color: #666666;
+      }
+      .url {
+        font-size: 55px;
+        font-weight: 600;
+        color: #22C55E;
+      }
+
+      @page {
+        size: A2 portrait;
+        margin: 0;
+      }
+
+      @media print {
+        body {
+          background: #FAFAFA; 
+          margin: 0;
+          padding: 0;
+          overflow: visible;
+          display: block;
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+        }
+        #scale-wrapper {
+          transform: none !important;
+          width: 100%;
+          height: 100%;
+          display: block;
+        }
+        .poster-container {
+          box-shadow: none;
+          width: 420mm !important;
+          height: 594mm !important;
+          transform: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="scale-wrapper">
+      <div class="poster-container">
+        <div class="bg-decor circle-1"></div>
+        <div class="bg-decor circle-2"></div>
+        <div class="logo-area">
+          <img src={logoImg.src} alt="Platcox Logo" style="width: auto; height: 260px;" />
+        </div>
+        <div class="content-area">
+          <h1 class="headline" style="font-size: 130px; letter-spacing: -3px;">
+            GLOBAL DIGITAL COMMERCE<br />
+            <span>INFRASTRUCTURE</span>
+          </h1>
+          <p class="subtitle" style="color: #22C55E; font-size: 55px; font-weight: 600;">
+            CLOUD ONTOLOGY DECISION ENGINE (C.O.D.E)
+          </p>
+        </div>
+        <div class="features">
+          <div class="feature-item">Sourcing & Strategy</div>
+          <div class="feature-item">Intelligent Operations</div>
+          <div class="feature-item">Seamless Supply Chain</div>
+        </div>
+        <div class="contact-banner">
+          <div class="slogan">Data into Direction. Foresight into Reality.</div>
+          <div class="url">platcox.com</div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function setScale() {
+        if (window.matchMedia('print').matches) {
+          document.querySelector('.poster-container').style.transform = 'none';
+          document.getElementById('scale-wrapper').style.width = '100%';
+          document.getElementById('scale-wrapper').style.height = '100%';
+          return;
+        }
+        
+        const wrapper = document.getElementById('scale-wrapper');
+        const container = document.querySelector('.poster-container');
+        
+        const hScale = (window.innerWidth - 60) / 1587;
+        const vScale = (window.innerHeight - 120) / 2245; // 120px padding vertical
+        const scale = Math.min(hScale, vScale, 1);
+        
+        container.style.transform = `scale(${scale})`;
+        
+        // This is the fix! Set the wrapper's physical layout size to the scaled version
+        // so the browser's flexbox alignment and scrollbars calculate perfectly.
+        wrapper.style.width = `${1587 * scale}px`;
+        wrapper.style.height = `${2245 * scale}px`;
+      }
+
+      window.addEventListener('resize', setScale);
+      document.addEventListener('DOMContentLoaded', setScale);
+      
+      window.matchMedia('print').addEventListener('change', (mql) => {
+          if (!mql.matches) { setTimeout(setScale, 100); }
+          else { 
+            document.querySelector('.poster-container').style.transform = 'none';
+            document.getElementById('scale-wrapper').style.width = '100%';
+            document.getElementById('scale-wrapper').style.height = '100%';
+          }
+      });
+      
+      // Run once immediately
+      setScale();
+    </script>
+  </body>
+</html>
