@@ -24,14 +24,17 @@ describe("MobileMenu", () => {
     expect(screen.getByText("Solutions")).toBeTruthy();
   });
 
-  it("shows all 5 nav links when open", () => {
+  it("shows all nav links when open", () => {
     render(<MobileMenu />);
     fireEvent.click(screen.getByRole("button", { name: "Toggle menu" }));
 
-    const expectedLinks = ["About", "Solutions", "Sustainability", "News", "Contact"];
+    // Sustainability + News bölümleri kaldırıldı → nav 3 öğe
+    const expectedLinks = ["About", "Solutions", "Contact"];
     for (const label of expectedLinks) {
       expect(screen.getByText(label)).toBeTruthy();
     }
+    expect(screen.queryByText("Sustainability")).toBeNull();
+    expect(screen.queryByText("News")).toBeNull();
   });
 
   it("toggle button closes the menu when clicked again", () => {
