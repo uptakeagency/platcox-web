@@ -1,0 +1,66 @@
+---
+import { getCollection } from "astro:content";
+import { buildTicker } from "../lib/ticker";
+
+const news = await getCollection("news");
+const { items, animate } = buildTicker(news);
+---
+{items.length > 0 && (
+  <div class="ticker" aria-label="Latest news">
+    <div class="ticker__label"><span class="livedot" aria-hidden="true"></span><span>İSTANBUL</span></div>
+    <div class="ticker__track" data-animate={animate ? "true" : "false"}>
+      <div class="marquee">
+        {items.map((i) => <a class="item" href={i.href}>{i.title}</a>)}
+        {animate && items.map((i) => <a class="item" href={i.href} aria-hidden="true" tabindex="-1">{i.title}</a>)}
+      </div>
+    </div>
+  </div>
+)}
+
+<style>
+  .ticker {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 46px;
+    display: flex; align-items: stretch; background: #fff;
+    border-top: 1px solid rgba(17,17,17,.08); z-index: 40;
+  }
+  .ticker__label {
+    display: flex; align-items: center; gap: 9px; padding: 0 20px;
+    border-right: 1px solid rgba(17,17,17,.08); flex: 0 0 auto;
+  }
+  .ticker__label span:last-child { font-size: 10.5px; font-weight: 600; letter-spacing: .16em; color: rgba(17,17,17,.8); }
+  .livedot { width: 7px; height: 7px; border-radius: 50%; background: #22C55E; position: relative; }
+  .livedot::after {
+    content: ""; position: absolute; inset: -4px; border-radius: 50%;
+    background: #22C55E; opacity: .35; animation: pulse 2.4s ease-out infinite;
+  }
+  @keyframes pulse { 0% { transform: scale(.6); opacity: .5; } 100% { transform: scale(1.8); opacity: 0; } }
+
+  .ticker__track {
+    flex: 1; overflow: hidden; display: flex; align-items: center; position: relative;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 40px, #000 calc(100% - 40px), transparent);
+            mask-image: linear-gradient(90deg, transparent, #000 40px, #000 calc(100% - 40px), transparent);
+  }
+  .marquee { display: inline-flex; align-items: center; white-space: nowrap; }
+  .item {
+    font-size: 12.5px; color: rgba(17,17,17,.52); letter-spacing: .01em;
+    text-decoration: none; padding: 14px 22px;  /* dikey padding = büyük hitbox */
+  }
+  .item:hover, .item:focus-visible { color: #111; text-decoration: underline; }
+  .item:focus-visible { outline: 2px solid #22C55E; outline-offset: 4px; }
+
+  /* animasyon yalnız data-animate=true + geniş ekran + reduced-motion kapalıysa */
+  @media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+    .ticker__track[data-animate="true"] .marquee {
+      animation: marquee 34s linear infinite;
+      will-change: transform;
+    }
+    .ticker__track[data-animate="true"]:hover .marquee,
+    .ticker__track[data-animate="true"]:focus-within .marquee { animation-play-state: paused; }
+  }
+  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  /* mobil: animasyon yok, kaydırılır */
+  @media (max-width: 767px) {
+    .ticker__track { overflow-x: auto; scroll-snap-type: x proximity; }
+  }
+</style>
