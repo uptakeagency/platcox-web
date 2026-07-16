@@ -1,0 +1,43 @@
+---
+import ManifestoRise from "./motion/primitives/ManifestoRise";
+import NewsTicker from "./NewsTicker.astro";
+---
+<section id="mission" class="mission-card">
+  <ManifestoRise
+    client:visible
+    as="h1"
+    trigger="viewport-once"
+    lines={["Organize global trade", "and make products accessible", "anywhere in the world"]}
+    className="mission-rise"
+  />
+  <NewsTicker />
+</section>
+
+<style>
+  .mission-card {
+    position: relative;
+    min-height: 100vh;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: clamp(40px, 7vw, 90px) clamp(28px, 6vw, 90px) 92px;
+  }
+  /* ManifestoRise React island → scope delinir (:global) */
+  :global(.mission-rise) {
+    font-weight: 300;
+    letter-spacing: -0.028em;
+    line-height: 1.08;
+    font-size: clamp(34px, 6vw, 92px);
+    max-width: 15ch;
+    color: #111;
+    margin: 0;
+  }
+  /* yeşil nokta imzası — son satır span'ine (string'e gömülemez) */
+  :global(.mission-rise span:last-of-type)::after {
+    content: ".";
+    color: #22C55E;
+  }
+</style>
