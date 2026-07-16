@@ -1,19 +1,22 @@
 import { describe, it, expect, beforeEach, afterEach } from "bun:test";
-import { render, screen } from "@testing-library/react";
+import { render, screen, act } from "@testing-library/react";
 import { renderToString } from "react-dom/server";
+import { createRef } from "react";
 import TickCounter from "../primitives/TickCounter";
 import { __resetPoolsForTesting } from "../hooks/useInViewport";
 import { mockMatchMedia } from "./helpers/mockMatchMedia";
 import { mockIntersectionObserver } from "./helpers/mockIntersectionObserver";
 import { mockRAF, type MockRAF } from "./helpers/mockRAF";
+import type { MotionRef } from "../types";
 
 describe("TickCounter", () => {
   let raf: MockRAF;
+  let mockIO: ReturnType<typeof mockIntersectionObserver>;
 
   beforeEach(() => {
     __resetPoolsForTesting();
     mockMatchMedia("(prefers-reduced-motion: reduce)", false);
-    mockIntersectionObserver();
+    mockIO = mockIntersectionObserver();
     raf = mockRAF();
   });
 
@@ -87,5 +90,48 @@ describe("TickCounter", () => {
       const html = renderToString(<TickCounter target={1500} format="currency" />);
       expect(html).toContain("1,500");
     }).not.toThrow();
+  });
+
+  // Codex P1: imperative start() viewport içinde animasyonu YENİDEN koşturmalı.
+  // (Bug: start() sadece ref bump'lıyor, effect dependency değişmediği için
+  //  RAF planlanmıyor → sayaç startValue'da takılı kalıyor.)
+  it("re-runs the count-up when start() is called imperatively while in view", () => {
+    // performance.now'ı 0'a sabitle: effect'in yakaladığı start=0 olsun ki
+    // mockRAF'ın 0-tabanlı saatiyle progress hesabı deterministik olsun.
+    const originalNow = performance.now;
+    performance.now = () => 0;
+    try {
+      const ref = createRef<Pick<MotionRef, "start" | "reset">>();
+      const { container } = render(
+        <TickCounter ref={ref} target={100} startValue={0} durationMs={100} />,
+      );
+      const span = container.querySelector("span") as HTMLSpanElement;
+
+      // Viewport'a gir → ilk count-up target'a ulaşsın.
+      act(() => {
+        mockIO.trigger(true, span);
+      });
+      act(() => {
+        raf.step(10); // now=160 > durationMs → target'a var
+      });
+      expect(span.textContent).toBe("100");
+
+      // reset → başa dön, animasyon dursun.
+      act(() => {
+        ref.current!.reset();
+      });
+      expect(span.textContent).toBe("0");
+
+      // Imperative start → animasyon yeniden koşmalı (bug'da 0'da kalır).
+      act(() => {
+        ref.current!.start();
+      });
+      act(() => {
+        raf.step(1);
+      });
+      expect(Number(span.textContent)).toBeGreaterThan(0);
+    } finally {
+      performance.now = originalNow;
+    }
   });
 });

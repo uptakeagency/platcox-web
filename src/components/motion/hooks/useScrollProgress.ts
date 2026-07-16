@@ -1,17 +1,11 @@
 import { useEffect, useRef, type RefObject } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-// ScrollTrigger.registerPlugin module-load'da global wheel/scroll/resize
-// listener'larını ve rAF loop'unu kurar (Codex P2). Hook'u import eden ama
-// scroll-progress kullanmayan sayfaların bu cost'u ödememesi için kaydı
-// erteliyoruz — sadece adapter+element guard'ları geçtiğinde tetikleniyor.
+// gsap + ScrollTrigger statik import DEĞİL (Codex P3): statik olsaydı bu hook'u
+// import eden HER modül (ör. viewport-only ManifestoRise adası) scroll-progress
+// modunu hiç kullanmasa bile GSAP'ı bundle'lardı. Bunun yerine yalnızca
+// adapter+element guard'ları geçince, effect içinde dinamik import ediyoruz;
+// böylece GSAP kendi lazy chunk'ına düşer ve viewport-only build'lere sızmaz.
 let scrollTriggerRegistered = false;
-function ensureScrollTriggerRegistered() {
-  if (scrollTriggerRegistered) return;
-  gsap.registerPlugin(ScrollTrigger);
-  scrollTriggerRegistered = true;
-}
 
 // Lenis veya GSAP-uyumlu başka bir scroll provider için minimal arayüz.
 // Hook bu adapter üzerinden subscribe eder; concrete Lenis sınıfı app-shell
@@ -56,31 +50,62 @@ export function useScrollProgress(
       return;
     }
 
-    ensureScrollTriggerRegistered();
-    const mq = window.matchMedia(opts.mobileQuery ?? "(max-width: 767px)");
+    // GSAP + ScrollTrigger dinamik import — sadece bu koda ulaşıldığında (adapter
+    // + element mevcut) yüklenir. Import async olduğu için setup'ı IIFE içinde
+    // yapıyoruz; unmount import çözülmeden gelirse `cancelled` ile iptal ediyoruz.
+    let cancelled = false;
+    let cleanup: (() => void) | null = null;
 
-    const onAdapterScroll = () => ScrollTrigger.update();
-    adapter.on("scroll", onAdapterScroll);
+    void (async () => {
+      const gsapMod = await import("gsap");
+      const { ScrollTrigger } = await import("gsap/ScrollTrigger");
+      if (cancelled) return;
 
-    const st = ScrollTrigger.create({
-      trigger: el,
-      start: "top top",
-      end: () =>
-        mq.matches ? opts.pinDistanceMobile : opts.pinDistanceDesktop,
-      pin: true,
-      scrub: 1,
-      onUpdate: (self) => {
-        progress.current = self.progress;
-      },
-    });
+      const gsap = gsapMod.default ?? (gsapMod as unknown as typeof gsapMod.default);
+      if (!scrollTriggerRegistered) {
+        gsap.registerPlugin(ScrollTrigger);
+        scrollTriggerRegistered = true;
+      }
 
-    const onBreakpointChange = () => ScrollTrigger.refresh();
-    mq.addEventListener("change", onBreakpointChange);
+      const mq = window.matchMedia(opts.mobileQuery ?? "(max-width: 767px)");
+
+      const onAdapterScroll = () => ScrollTrigger.update();
+      adapter.on("scroll", onAdapterScroll);
+
+      const st = ScrollTrigger.create({
+        trigger: el,
+        start: "top top",
+        end: () =>
+          mq.matches ? opts.pinDistanceMobile : opts.pinDistanceDesktop,
+        pin: true,
+        scrub: 1,
+        onUpdate: (self) => {
+          progress.current = self.progress;
+        },
+      });
+
+      const onBreakpointChange = () => ScrollTrigger.refresh();
+      mq.addEventListener("change", onBreakpointChange);
+
+      cleanup = () => {
+        st.kill(true); // pin spacer'ı da kaldır
+        adapter.off("scroll", onAdapterScroll);
+        mq.removeEventListener("change", onBreakpointChange);
+      };
+
+      // Setup tam biterken unmount olduysa hemen temizle (race guard).
+      if (cancelled) {
+        cleanup();
+        cleanup = null;
+      }
+    })();
 
     return () => {
-      st.kill(true); // pin spacer'ı da kaldır
-      adapter.off("scroll", onAdapterScroll);
-      mq.removeEventListener("change", onBreakpointChange);
+      cancelled = true;
+      if (cleanup) {
+        cleanup();
+        cleanup = null;
+      }
     };
   }, [
     opts.triggerSelector,

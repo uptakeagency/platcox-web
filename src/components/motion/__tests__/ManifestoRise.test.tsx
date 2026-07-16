@@ -92,7 +92,7 @@ describe("ManifestoRise (scroll-progress variant)", () => {
     expect(html).not.toMatch(/opacity:\s*0/);
   });
 
-  it("wires useScrollProgress when sectionId + adapter provided", () => {
+  it("wires useScrollProgress when sectionId + adapter provided", async () => {
     const trigger = document.createElement("section");
     trigger.id = "hero";
     document.body.appendChild(trigger);
@@ -109,6 +109,8 @@ describe("ManifestoRise (scroll-progress variant)", () => {
         scrollAdapter={fakeAdapter}
       />,
     );
+    // useScrollProgress GSAP'ı dinamik import ediyor (Codex P3) → create async.
+    await flushAsyncImport();
     expect(stCreate.mock.calls.length).toBe(1);
     expect(fakeAdapter.on.callCount()).toBe(1);
   });
@@ -165,4 +167,12 @@ function makeSpyOn() {
   };
   fn.callCount = () => calls;
   return fn;
+}
+
+// Hook GSAP'ı effect içinde dinamik import ediyor; modül I/O'su tek makro-task'tan
+// uzun sürebildiği için önce cache'i ısıt, sonra bir tur bekle (bkz. useScrollProgress.test).
+async function flushAsyncImport(): Promise<void> {
+  await import("gsap");
+  await import("gsap/ScrollTrigger");
+  await new Promise((resolve) => setTimeout(resolve, 0));
 }

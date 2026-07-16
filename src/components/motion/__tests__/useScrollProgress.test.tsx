@@ -71,7 +71,7 @@ describe("useScrollProgress", () => {
     expect(stubs.create.mock.calls.length).toBe(0);
   });
 
-  it("creates a ScrollTrigger and subscribes to adapter scroll events when wired", () => {
+  it("creates a ScrollTrigger and subscribes to adapter scroll events when wired", async () => {
     const target = document.createElement("div");
     target.className = "trigger-target";
     document.body.appendChild(target);
@@ -86,6 +86,9 @@ describe("useScrollProgress", () => {
       }),
     );
 
+    // GSAP artık dinamik import; setup async IIFE içinde. Import çözülene kadar bekle.
+    await flushAsyncImport();
+
     expect(stubs.create.mock.calls.length).toBe(1);
     expect(fakeAdapter.on.callCount()).toBe(1);
     // ScrollTrigger.create config'i kontrolü: trigger element doğru mu?
@@ -99,7 +102,7 @@ describe("useScrollProgress", () => {
     expect(config.pin).toBe(true);
   });
 
-  it("cleans up ScrollTrigger and adapter subscription on unmount", () => {
+  it("cleans up ScrollTrigger and adapter subscription on unmount", async () => {
     const target = document.createElement("div");
     target.className = "cleanup-target";
     document.body.appendChild(target);
@@ -114,11 +117,24 @@ describe("useScrollProgress", () => {
       }),
     );
 
+    // Dinamik import çözülene kadar bekle → adapter.on çağrılsın, cleanup kurulsun.
+    await flushAsyncImport();
+
     expect(fakeAdapter.on.callCount()).toBe(1);
     unmount();
     expect(fakeAdapter.off.callCount()).toBe(1);
   });
 });
+
+// Hook artık GSAP'ı effect içinde dinamik import ediyor (detached async IIFE).
+// Modül I/O'su bir setTimeout(0) turundan uzun sürebildiği için önce aynı
+// modülleri burada await'leyip cache'i ısıtıyoruz; ardından bir makro-task turu
+// hook'un IIFE devamının create/subscribe'ı bitirmesine izin veriyor.
+async function flushAsyncImport(): Promise<void> {
+  await import("gsap");
+  await import("gsap/ScrollTrigger");
+  await new Promise((resolve) => setTimeout(resolve, 0));
+}
 
 function makeSpy() {
   let calls = 0;

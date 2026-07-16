@@ -91,6 +91,9 @@ const TickCounter = forwardRef<
   const [hydrated, setHydrated] = useState(false);
   const rafIdRef = useRef<number | null>(null);
   const animateTokenRef = useRef(0);
+  // runNonce: imperative start() bunu artırır → animation effect yeniden koşar.
+  // (Codex P1: ref bump effect dependency değiştirmediği için start() no-op'tu.)
+  const [runNonce, setRunNonce] = useState(0);
 
   useEffect(() => {
     setHydrated(true);
@@ -137,14 +140,15 @@ const TickCounter = forwardRef<
         rafIdRef.current = null;
       }
     };
-  }, [hydrated, isInView, reduced, target, startValue, durationMs]);
+  }, [hydrated, isInView, reduced, target, startValue, durationMs, runNonce]);
 
   useImperativeHandle(imperativeRef, () => ({
     start: () => {
-      animateTokenRef.current += 1;
+      // runNonce'u artır → animation effect yeniden koşar ve yeni RAF planlar.
+      // isInView zaten true olmalı; viewport-out durumunda effect erken return
+      // eder, yani dışarıdan start çağrısı görünür değilken etkisizdir (intentional).
       setDisplay(startValue);
-      // useEffect'in trigger edebilmesi için isInView'in zaten true olması gerek;
-      // dışarıdan start çağrısı viewport-out durumunda etkisiz olur (intentional).
+      setRunNonce((n) => n + 1);
     },
     reset: () => {
       if (rafIdRef.current !== null) cancelAnimationFrame(rafIdRef.current);

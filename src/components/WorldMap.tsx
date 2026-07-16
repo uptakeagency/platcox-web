@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useRef, useState } from "react";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 
 interface Location {
   id: string;
@@ -40,9 +40,34 @@ const locationsById = new Map(locations.map((l) => [l.id, l]));
 
 export default function WorldMap() {
   const [active, setActive] = useState<string | null>(null);
+  const reduced = useReducedMotion();
+  // Her route'un <animate> elementine ref → harita viewport'a girince staggered
+  // beginElement() ile tetiklenir (aşağıdaki startRoutes).
+  const animateRefs = useRef<Array<SVGAnimateElement | null>>([]);
+  const startedRef = useRef(false);
+
+  // Rotalar SADECE harita viewport'a girince çizilir (Codex P2 fix). Önceden
+  // <animate begin="indefinite; {i*200}ms"> ile ${i*200}ms clause'u document-load'dan
+  // sonra otomatik başlıyordu → fold-altı rotalar kullanıcı scroll etmeden bitiyordu.
+  // Şimdi begin="indefinite" + burada staggered beginElement(). reduced-motion'da
+  // çizim yok; rotalar global CSS ([data-motion-reduced-end-state] → stroke-dashoffset:0)
+  // ile zaten end-state'te görünür.
+  const startRoutes = () => {
+    if (startedRef.current) return; // once
+    startedRef.current = true;
+    if (reduced) return;
+    animateRefs.current.forEach((el, i) => {
+      if (!el) return;
+      window.setTimeout(() => el.beginElement(), i * 200);
+    });
+  };
 
   return (
-    <div className="relative aspect-[2/1] w-full">
+    <motion.div
+      className="relative aspect-[2/1] w-full"
+      onViewportEnter={startRoutes}
+      viewport={{ once: true }}
+    >
       <svg viewBox="0 0 1000 500" className="h-full w-full" fill="none">
         {/* Simplified continent outlines */}
         <path d="M150,120 Q200,100 250,110 Q300,100 350,120 Q330,180 300,200 Q250,220 200,210 Q170,180 150,120Z" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.1)" strokeWidth="0.5" />
@@ -53,8 +78,9 @@ export default function WorldMap() {
         <path d="M740,160 Q800,140 860,160 Q880,200 860,240 Q820,260 780,240 Q750,210 740,160Z" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.1)" strokeWidth="0.5" />
 
         {/* Trade routes — TradeRoute primitive paterni inline (Phase 6 Task 6.2).
-            Page-level motion observer (BaseLayout) viewport'a girince
-            beginElement() ile animate'ı tetikler. */}
+            Viewport gating BaseLayout page-observer'ı yerine bu component'te
+            yapılıyor (startRoutes + onViewportEnter) → data-motion-trigger YOK,
+            böylece page observer ile çifte tetikleme olmaz; stagger korunur. */}
         {routes.map((route, i) => {
           const from = locationsById.get(route.from);
           const to = locationsById.get(route.to);
@@ -69,7 +95,6 @@ export default function WorldMap() {
           return (
             <g
               key={`route-${route.from}-${route.to}`}
-              data-motion-trigger="viewport-once"
               data-motion-reduced-end-state
             >
               <path
@@ -83,6 +108,9 @@ export default function WorldMap() {
                 strokeDashoffset="1"
               >
                 <animate
+                  ref={(node) => {
+                    animateRefs.current[i] = node as SVGAnimateElement | null;
+                  }}
                   attributeName="stroke-dashoffset"
                   from="1"
                   to="0"
@@ -90,7 +118,7 @@ export default function WorldMap() {
                   keySplines="0.65 0 0.35 1"
                   calcMode="spline"
                   fill="freeze"
-                  begin={`indefinite; ${i * 200}ms`}
+                  begin="indefinite"
                 />
               </path>
             </g>
@@ -129,6 +157,6 @@ export default function WorldMap() {
           </AnimatePresence>
         </motion.div>
       ))}
-    </div>
+    </motion.div>
   );
 }

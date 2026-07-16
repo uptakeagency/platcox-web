@@ -59,7 +59,12 @@ try {
     passes += r.passes?.length ?? 0;
   }
 } catch (err) {
-  console.warn(`[axe] JSON parse başarısız (${OUTPUT}): ${err}`);
+  // Rapor okunamıyor/parse edilemiyorsa audit KENDİ çıktısını doğrulayamamış
+  // demektir — bunu "temiz" (violations=0) sayıp 0 ile çıkmak sessiz geçiş
+  // olur. Okunamayan raporu hard failure olarak işle (Codex P1).
+  console.error(`[axe] Rapor parse edilemedi (${OUTPUT}): ${err}`);
+  console.error("[axe] Audit kendi çıktısını okuyamadı — başarı raporlanmıyor.");
+  process.exit(1);
 }
 
 console.log(`[axe] Pass: ${passes}, Violation: ${violations}`);
