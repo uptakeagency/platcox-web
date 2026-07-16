@@ -59,8 +59,9 @@ const { items, animate } = buildTicker(news);
   }
   @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
-  /* mobil: animasyon yok, kaydırılır */
+  /* mobil: animasyon yok, kaydırılır; duplicate kopya (desktop marquee için) gizli */
   @media (max-width: 767px) {
     .ticker__track { overflow-x: auto; scroll-snap-type: x proximity; }
+    .item[aria-hidden="true"] { display: none; }
   }
 </style>
