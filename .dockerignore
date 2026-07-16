@@ -6,3 +6,4 @@ dist
 .astro
 .superpowers
 docs
+.worktrees/
