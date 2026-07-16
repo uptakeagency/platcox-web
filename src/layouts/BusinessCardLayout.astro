@@ -1,0 +1,56 @@
+---
+import "@fontsource/inter/300.css";
+import "@fontsource/inter/500.css";
+import "@fontsource/inter/600.css";
+import "../styles/card-reset.css";
+
+interface Props { title?: string; description?: string; ogImage?: string }
+const {
+  title = "PlatcoX — Organize global trade",
+  description = "Organize global trade and make products accessible anywhere in the world. Get in touch: info@platcox.com",
+  ogImage = "/og-default.png",
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImageURL = new URL(ogImage, Astro.site);
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://www.platcox.com/#organization",
+      name: "PlatcoX",
+      url: "https://www.platcox.com",
+      logo: { "@type": "ImageObject", url: "https://www.platcox.com/logo-512.png", width: 512, height: 512 },
+      email: "info@platcox.com",
+    },
+    { "@type": "WebSite", "@id": "https://www.platcox.com/#website", url: "https://www.platcox.com", name: "PlatcoX" },
+  ],
+};
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical.href} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="PlatcoX" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical.href} />
+    <meta property="og:image" content={ogImageURL.href} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageURL.href} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
