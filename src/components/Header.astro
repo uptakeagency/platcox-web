@@ -1,0 +1,63 @@
+---
+import { Image } from "astro:assets";
+import logo from "../assets/platcox-logo.png";
+import MobileMenu from "./MobileMenu.tsx";
+
+const navLinks = [
+  { label: "About", href: "#about" },
+  { label: "Philosophy", href: "#philosophy" },
+  { label: "Solutions", href: "#solutions" },
+  { label: "Locations", href: "#locations" },
+  { label: "Contact", href: "#contact" },
+];
+---
+
+<header id="site-header" class="fixed top-0 left-0 right-0 z-50 bg-bg/70 backdrop-blur-md border-b border-border/50 transition-all duration-300">
+  <div class="container-content flex items-center justify-between py-5">
+    <a href="/" class="relative z-50 block">
+      <Image
+        src={logo}
+        alt="platcoX"
+        width={200}
+        height={74}
+        loading="eager"
+        class="h-8 w-auto md:h-10"
+      />
+    </a>
+
+    <nav class="hidden items-center gap-8 lg:flex">
+      {navLinks.map((link) => (
+        <a href={link.href} class="text-sm font-medium text-foreground/70 transition-colors hover:text-foreground">
+          {link.label}
+        </a>
+      ))}
+      <a href="#contact" class="border border-foreground px-5 py-2 text-sm font-medium text-foreground transition-colors hover:bg-foreground hover:text-bg">
+        Get Started
+      </a>
+    </nav>
+
+    <div class="lg:hidden">
+      <MobileMenu client:media="(max-width: 1023px)" />
+    </div>
+  </div>
+</header>
+
+<script>
+  const header = document.getElementById("site-header");
+  if (header) {
+    window.addEventListener(
+      "scroll",
+      () => {
+        if (window.scrollY > 80) {
+          // Solid + sharper border once user has scrolled past the hero
+          header.classList.remove("bg-bg/70", "border-border/50");
+          header.classList.add("bg-bg/95", "border-border");
+        } else {
+          header.classList.remove("bg-bg/95", "border-border");
+          header.classList.add("bg-bg/70", "border-border/50");
+        }
+      },
+      { passive: true },
+    );
+  }
+</script>

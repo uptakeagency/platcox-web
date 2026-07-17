@@ -1,0 +1,252 @@
+---
+// Dev-only motion library playground.
+// Phase 0 Gate B kararı: v1'de Storybook yok, primitive demo'ları burada toplanır.
+// BaseLayout sarmalı — page-level motion observer (BaseLayout body script'i)
+// SMIL primitive'lerin begin="indefinite" animate'lerini tetikler.
+import BaseLayout from "../layouts/BaseLayout.astro";
+import TradeRoute from "../components/motion/primitives/TradeRoute";
+import SketchStroke from "../components/motion/primitives/SketchStroke";
+import NumberedReveal from "../components/motion/primitives/NumberedReveal";
+import ManifestoRise from "../components/motion/primitives/ManifestoRise";
+import TickCounter from "../components/motion/primitives/TickCounter";
+import DecisionPulse from "../components/motion/primitives/DecisionPulse";
+import DataScan from "../components/motion/primitives/DataScan";
+import OntologyGraph from "../components/motion/primitives/OntologyGraph";
+
+const codeGraph = {
+  nodes: [
+    { id: "a", x: 30, y: 40, label: "Data" },
+    { id: "b", x: 80, y: 60, label: "Ontology" },
+    { id: "c", x: 130, y: 30, label: "Decision" },
+    { id: "d", x: 170, y: 70, label: "Action" },
+  ],
+  edges: [
+    { from: "a", to: "b" },
+    { from: "b", to: "c" },
+    { from: "b", to: "d" },
+    { from: "c", to: "d" },
+  ],
+};
+
+const simpleGraph = {
+  nodes: [
+    { id: "n1", x: 50, y: 40, label: "Sourcing" },
+    { id: "n2", x: 100, y: 60, label: "Strategy" },
+    { id: "n3", x: 160, y: 30, label: "Operations" },
+  ],
+  edges: [
+    { from: "n1", to: "n2" },
+    { from: "n2", to: "n3" },
+  ],
+};
+
+const dataScanRows = [
+  { label: "Karachi → Rotterdam", value: "14g" },
+  { label: "Shenzhen → Hamburg", value: "28g" },
+  { label: "İstanbul → New York", value: "11g" },
+];
+
+const numberedItems = [
+  { num: "/0.1", title: "Strateji sonradan akla gelmiş bir şey değildir." },
+  { num: "/0.2", title: "Operasyonlar niyetle nefes alır." },
+  { num: "/0.3", title: "Sayılar yerini hak eder." },
+];
+---
+
+<BaseLayout title="Motion Library Playground (dev)" description="Motion library primitive demo sayfası — dev-only.">
+  <main class="playground">
+    <h1>Motion Library Playground</h1>
+    <p class="meta">
+      Dev-only sayfa. Production'da route public ama sitemap'ten hariç. Tüm primitive'ler aşağıda demo'lanır.
+    </p>
+
+    <section class="demo">
+      <h2>TradeRoute — default (viewport-once)</h2>
+      <div style="width: 400px; color: #111;">
+        <TradeRoute client:load from={{ x: 20, y: 80 }} to={{ x: 180, y: 20 }} ariaLabel="Demo trade route" />
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>TradeRoute — yüksek curve</h2>
+      <div style="width: 400px; color: #2563eb;">
+        <TradeRoute client:load from={{ x: 20, y: 80 }} to={{ x: 180, y: 20 }} curve={0.8} />
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>TradeRoute — manual trigger</h2>
+      <div style="width: 400px; color: #16a34a;">
+        <TradeRoute client:load from={{ x: 20, y: 80 }} to={{ x: 180, y: 20 }} trigger="manual" id="demo-route" />
+      </div>
+      <button
+        type="button"
+        onclick="window.__motionTrigger && window.__motionTrigger('demo-route')"
+        style="margin-top: 8px; padding: 6px 12px; cursor: pointer;"
+      >
+        Trigger
+      </button>
+    </section>
+
+    <section class="demo">
+      <h2>SketchStroke — circle (default)</h2>
+      <div style="width: 240px; color: #111;">
+        <SketchStroke client:load />
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>SketchStroke — ring</h2>
+      <div style="width: 240px; color: #2563eb;">
+        <SketchStroke client:load shape="ring" />
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>SketchStroke — arrow</h2>
+      <div style="width: 240px; color: #16a34a;">
+        <SketchStroke client:load shape="arrow" />
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>SketchStroke — custom (üçgen)</h2>
+      <div style="width: 240px; color: #db2777;">
+        <SketchStroke client:load shape="custom" path="M 10 80 L 60 20 L 110 80 Z" durationMs={1500} />
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>OntologyGraph — Sourcing → Strategy → Operations (basit)</h2>
+      <div style="width: 480px; color: #111;">
+        <OntologyGraph client:load {...simpleGraph} ariaLabel="Sourcing to Strategy to Operations" />
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>OntologyGraph — C.O.D.E akışı (yoğun)</h2>
+      <div style="width: 480px; color: #2563eb;">
+        <OntologyGraph client:load {...codeGraph} ariaLabel="C.O.D.E flow" />
+      </div>
+      <p style="margin-top: 8px; font-size: 0.75rem; color: #6b7280;">
+        Tab ile node'lar arasında gez; Enter/Space ile detayı aç; Esc kapatır.
+      </p>
+    </section>
+
+    <section class="demo">
+      <h2>DataScan — varsayılan (mono, 3 satır)</h2>
+      <div style="width: 420px; color: #111;">
+        <DataScan client:load rows={dataScanRows} />
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>DataScan — mono=false, çok satır</h2>
+      <div style="width: 420px; color: #2563eb;">
+        <DataScan client:load rows={[...dataScanRows, ...dataScanRows]} mono={false} />
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>DecisionPulse — uptrend (kar amaçlı)</h2>
+      <div style="width: 360px;">
+        <DecisionPulse client:load title="Stock-out riski" value="+12%" trend="up" />
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>DecisionPulse — downtrend (uyarı)</h2>
+      <div style="width: 360px;">
+        <DecisionPulse client:load title="Marj erozyonu" value="-3.4%" trend="down" />
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>DecisionPulse — pulse=false (statik)</h2>
+      <div style="width: 360px;">
+        <DecisionPulse client:load title="Pulse yok" value="—" pulse={false} />
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>DecisionPulse — neutral trend</h2>
+      <div style="width: 360px;">
+        <DecisionPulse client:load title="Yatay seyir" value="0.0%" trend="neutral" />
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>TickCounter — büyük sayı</h2>
+      <p style="font-size: 2rem; font-weight: 300;">
+        <TickCounter client:load target={240000} suffix="+" />
+      </p>
+    </section>
+
+    <section class="demo">
+      <h2>TickCounter — currency USD</h2>
+      <p style="font-size: 2rem; font-weight: 300;">
+        <TickCounter client:load target={1500000} format="currency" currency="USD" />
+      </p>
+    </section>
+
+    <section class="demo">
+      <h2>TickCounter — percent (2 ondalık)</h2>
+      <p style="font-size: 2rem; font-weight: 300;">
+        <TickCounter client:load target={0.4275} format="percent" precision={2} />
+      </p>
+    </section>
+
+    <section class="demo">
+      <h2>ManifestoRise — default (h1, 2 satır)</h2>
+      <ManifestoRise client:load lines={["Where Global Trade", "Gets Redefined."]} />
+    </section>
+
+    <section class="demo">
+      <h2>ManifestoRise — yavaş cinematic (3 satır, 400ms stagger)</h2>
+      <ManifestoRise client:load lines={["Data into Direction.", "Foresight into Reality.", "From Concept to Commerce."]} durationMs={2400} staggerDelay={400} as="h2" />
+    </section>
+
+    <section class="demo">
+      <h2>NumberedReveal — default stagger (120ms)</h2>
+      <NumberedReveal client:load items={numberedItems} />
+    </section>
+
+    <section class="demo">
+      <h2>NumberedReveal — yavaş stagger (400ms)</h2>
+      <NumberedReveal client:load items={numberedItems} staggerDelay={400} />
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  .playground {
+    font-family: Inter, system-ui, sans-serif;
+    padding: 40px;
+    background: #fafafa;
+    color: #111;
+    min-height: 100vh;
+  }
+  .playground h1 {
+    font-weight: 300;
+    font-size: 2rem;
+    margin: 0 0 8px;
+  }
+  .playground .meta {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-bottom: 32px;
+  }
+  .playground .demo {
+    padding: 24px;
+    border: 1px solid #e5e7eb;
+    margin-bottom: 16px;
+    background: #fff;
+    border-radius: 6px;
+  }
+  .playground .demo h2 {
+    font-weight: 500;
+    font-size: 1rem;
+    margin: 0 0 12px;
+    letter-spacing: -0.01em;
+  }
+</style>

@@ -1,0 +1,31 @@
+---
+import ScrollReveal from "./motion/ScrollReveal";
+import NumberedReveal from "./motion/primitives/NumberedReveal";
+
+const rawItems = [
+  { num: "/0.1", text: "Every operation is meticulously organized — strategy isn't an afterthought." },
+  { num: "/0.2", text: "We turn data into direction — foresight drives every move we make." },
+  { num: "/0.3", text: "From concept to commerce — we carry brands across borders, seamlessly." },
+];
+
+const numberedItems = rawItems.map((it) => ({ num: it.num, title: it.text }));
+---
+
+<section id="about" class="section-padding">
+  <div class="container-content">
+    <ScrollReveal client:idle animation="fade-up">
+      <h2 class="text-4xl font-light leading-tight tracking-tight md:text-5xl lg:text-6xl">
+        Our solutions power real-time, cross-border commerce
+        <span class="text-muted"> from the sourcing floor to the storefront</span>
+      </h2>
+    </ScrollReveal>
+
+    <NumberedReveal
+      client:idle
+      items={numberedItems}
+      className="mt-24"
+      ariaLabel="About platcoX principles"
+      staggerDelay={150}
+    />
+  </div>
+</section>

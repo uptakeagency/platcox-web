@@ -1,0 +1,47 @@
+---
+import ManifestoRise from "./motion/primitives/ManifestoRise";
+import ScrollReveal from "./motion/ScrollReveal";
+---
+
+<section id="hero" class="relative flex min-h-[100svh] flex-col items-center justify-center overflow-hidden">
+  <!-- Video Background -->
+  <video
+    autoplay
+    muted
+    loop
+    playsinline
+    preload="metadata"
+    aria-hidden="true"
+    class="absolute inset-0 h-full w-full object-cover motion-reduce:hidden"
+    poster="/videos/hero-poster.jpg"
+  >
+    <source src="/videos/hero-bg.mp4" type="video/mp4" />
+  </video>
+
+  <!-- Gradient Overlay -->
+  <div class="absolute inset-0 bg-gradient-to-b from-bg/70 via-bg/40 to-bg"></div>
+
+  <!-- Content -->
+  <div class="relative z-10 px-6">
+    <ManifestoRise
+      client:load
+      lines={["Where Global Trade", "Gets Redefined."]}
+      as="h1"
+      durationMs={2400}
+      staggerDelay={600}
+      className="text-center text-5xl font-light leading-tight tracking-tight md:text-7xl lg:text-[96px] lg:leading-[1.05] lg:tracking-[-2px]"
+    />
+
+    <ScrollReveal client:load animation="fade-in" delay={600}>
+      <p class="mt-6 text-center text-lg text-muted">
+        Sourcing. Strategy. Intelligent Operations. Ontologic Sales.
+      </p>
+    </ScrollReveal>
+  </div>
+
+  <!-- Scroll Indicator -->
+  <div class="absolute bottom-12 z-10 flex flex-col items-center gap-2">
+    <span class="text-xs text-muted">Scroll to Explore</span>
+    <div class="animate-bounce text-muted">&darr;</div>
+  </div>
+</section>

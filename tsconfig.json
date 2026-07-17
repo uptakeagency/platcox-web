@@ -4,5 +4,8 @@
     "jsx": "react-jsx",
     "jsxImportSource": "react",
     "types": ["bun"]
-  }
+  },
+  "exclude": [
+    "src/pages/poster.astro"
+  ]
 }

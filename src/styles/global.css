@@ -1,0 +1,92 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Motion library keyframes — DecisionPulse pulse-ring, DataScan vb. */
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 currentColor;
+  }
+  100% {
+    box-shadow: 0 0 0 14px transparent;
+  }
+}
+
+@keyframes data-scan {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Breathing: scale ile yap (Codex P2). Önceki `r: 4 → 5` keyframe'i
+   weight prop'unun set ettiği r={4+weight}'i override ediyordu →
+   weighted node'lar uniform boya çöküyordu. transform:scale her
+   weight'i orantılı şişiriyor; r ham değeri korunuyor. */
+@keyframes ontology-breath {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.125);
+  }
+}
+
+@keyframes ontology-edge-flow {
+  to {
+    stroke-dashoffset: -5;
+  }
+}
+
+[data-ontology-node] {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ontology-breath 3s ease-in-out infinite;
+}
+
+[data-ontology-edge] {
+  animation: ontology-edge-flow 2.5s linear infinite;
+}
+
+@layer base {
+  body {
+    @apply bg-bg text-foreground font-sans antialiased;
+  }
+
+  /* Respect users who prefer reduced motion (WCAG 2.3.3) */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  .section-padding {
+    @apply py-24 px-6 md:py-[200px] md:px-8;
+  }
+
+  .section-label {
+    @apply text-[11px] font-medium uppercase tracking-[3px] text-muted mb-4;
+  }
+
+  .section-number {
+    @apply text-xs text-muted;
+  }
+
+  .container-content {
+    @apply max-w-[1100px] mx-auto;
+  }
+
+  .section-divider {
+    @apply border-t border-border;
+  }
+}

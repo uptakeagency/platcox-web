@@ -1,0 +1,35 @@
+---
+import ScrollReveal from "./motion/ScrollReveal";
+import NumberedReveal from "./motion/primitives/NumberedReveal";
+
+const solutions = [
+  { num: "/01", title: "Idea Factories", description: "Creative churns & birth of concepts and ideas" },
+  { num: "/02", title: "Design Centres", description: "Bringing art and science together" },
+  { num: "/03", title: "Product Development", description: "Transforming ideas and concepts into products" },
+  { num: "/04", title: "Manufacturing Centres", description: "Threading together designs into products" },
+  { num: "/05", title: "Showrooms", description: "Bringing alive the look & feel" },
+];
+---
+
+<section id="solutions" class="section-padding">
+  <div class="container-content">
+    <ScrollReveal client:idle animation="fade-up">
+      <p class="section-label">OUR SOLUTIONS</p>
+      <h2 class="text-3xl font-light tracking-tight md:text-5xl">
+        Engineered to scale vision with precision.
+      </h2>
+      <p class="mt-6 max-w-2xl text-muted">
+        Our solutions are built around intelligent sourcing, product development, cross-border
+        operational infrastructure, and market access — enabling scalable international growth.
+      </p>
+    </ScrollReveal>
+
+    <NumberedReveal
+      client:idle
+      items={solutions}
+      className="mt-20"
+      ariaLabel="platcoX solutions catalogue"
+      staggerDelay={100}
+    />
+  </div>
+</section>
