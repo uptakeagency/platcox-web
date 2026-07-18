@@ -113,11 +113,23 @@ const jsonLd = {
          kullanıcılarında native scroll'a düşer. -->
     <script>
       import { getLenis } from "../lib/lenisSingleton";
+      import { createSectionPager } from "../lib/sectionPager";
       const reduceMotion = window.matchMedia?.(
         "(prefers-reduced-motion: reduce)",
       ).matches;
+      const desktop = window.matchMedia?.(
+        "(min-width:768px) and (pointer:fine)",
+      ).matches;
       if (!reduceMotion) {
-        getLenis();
+        const lenis = getLenis();
+        if (lenis && desktop) {
+          createSectionPager({
+            lenis,
+            getSections: () =>
+              Array.from(document.querySelectorAll("main > section")),
+            headerOffset: 80,
+          });
+        }
       }
     </script>
 

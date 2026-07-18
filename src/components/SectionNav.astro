@@ -1,0 +1,69 @@
+---
+// Nokta nav — masaüstü pager için bölüm göstergesi. Bölümler client-side
+// main > section üzerinden bulunur; SSR'da boş <nav>, JS doldurur.
+---
+<nav class="section-nav" aria-label="Section navigation" data-section-nav></nav>
+
+<style>
+  .section-nav {
+    position: fixed; right: 22px; top: 50%; transform: translateY(-50%);
+    z-index: 45; display: none; flex-direction: column; gap: 12px;
+  }
+  @media (min-width: 768px) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .section-nav[data-ready] { display: flex; }
+  }
+  .section-nav :global(button) {
+    width: 9px; height: 9px; border-radius: 50%; padding: 0; border: 0;
+    background: rgba(17, 17, 17, 0.22); cursor: pointer;
+    transition: background 0.25s, transform 0.25s;
+  }
+  .section-nav :global(button:hover) { background: rgba(17, 17, 17, 0.5); }
+  .section-nav :global(button[aria-current="true"]) {
+    background: #22c55e; transform: scale(1.35);
+  }
+  .section-nav :global(button:focus-visible) {
+    outline: 2px solid #22c55e; outline-offset: 3px;
+  }
+</style>
+
+<script>
+  const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+  const desktop = window.matchMedia?.("(min-width:768px) and (pointer:fine)").matches;
+  if (!reduce && desktop) {
+    const nav = document.querySelector("[data-section-nav]");
+    const sections = Array.from(
+      document.querySelectorAll("main > section"),
+    ) as HTMLElement[];
+    if (nav && sections.length) {
+      const buttons = sections.map((sec) => {
+        const b = document.createElement("button");
+        const label = sec.getAttribute("id") || "section";
+        b.setAttribute("aria-label", "Go to " + label);
+        b.addEventListener("click", () => {
+          import("../lib/lenisSingleton").then(({ getLenis }) => {
+            const l = getLenis();
+            const top = sec.getBoundingClientRect().top + window.scrollY - 80;
+            if (l) l.scrollTo(top, { duration: 0.9 });
+            else window.scrollTo({ top, behavior: "smooth" });
+          });
+        });
+        nav.appendChild(b);
+        return b;
+      });
+      nav.setAttribute("data-ready", "");
+      const io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (!e.isIntersecting) return;
+            const idx = sections.indexOf(e.target as HTMLElement);
+            buttons.forEach((b, i) =>
+              b.setAttribute("aria-current", i === idx ? "true" : "false"),
+            );
+          });
+        },
+        { rootMargin: "-45% 0px -45% 0px" },
+      );
+      sections.forEach((s) => io.observe(s));
+    }
+  }
+</script>
