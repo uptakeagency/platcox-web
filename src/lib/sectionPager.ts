@@ -11,35 +11,56 @@ export interface PagerTarget { scrollTo: number; index: number }
 const STEP = 0.85; // iç-adım = viewport oranı (feel'de tune edilir)
 const EDGE = 4;    // px tolerans
 
-// Aktif bölüm: scrollY+header referans noktasını içeren bölüm (yoksa en yakın).
+// Bir bölümün "hizalı" scroll konumu: üstü fixed header'ın altına oturur.
+// Pager daima buraya scrollTo eder; sınır tespiti de buna göre yapılır
+// (ham section.top değil — yoksa header offset ilk/son bölümde no-op üretir).
+function alignedTop(s: PagerState, i: number): number {
+  return Math.max(0, s.sections[i].top - s.headerOffset);
+}
+
+// Aktif bölüm: scrollY'nin (küçük tolerlansla) düştüğü son bölüm.
 function activeIndex(s: PagerState): number {
-  const ref = s.scrollY + s.headerOffset;
-  for (let i = s.sections.length - 1; i >= 0; i--) {
-    if (ref >= s.sections[i].top - EDGE) return i;
+  for (let k = s.sections.length - 1; k >= 0; k--) {
+    if (s.scrollY + EDGE >= alignedTop(s, k)) return k;
   }
   return 0;
 }
 
+// Verili scroll durumu + yön için sonraki hedefi hesaplar.
+// null = sınır (hareket yok). Kısa bölüm → komşu bölüm; uzun bölüm →
+// önce kendi içinde ~STEP*viewport adım, dibine/tepesine gelince komşu.
 export function nextTarget(s: PagerState): PagerTarget | null {
   const i = activeIndex(s);
   const sec = s.sections[i];
-  const clampMin = (v: number) => (v < 0 ? 0 : v);
+  let target: number;
+  let index: number;
+
   if (s.direction === 1) {
     const bottom = sec.top + sec.height;
     const bottomVisible = s.scrollY + s.viewport >= bottom - EDGE;
     if (!bottomVisible) {
-      const target = Math.min(s.scrollY + s.viewport * STEP, bottom - s.viewport);
-      return { scrollTo: clampMin(target), index: i };
+      target = Math.min(s.scrollY + s.viewport * STEP, bottom - s.viewport);
+      index = i;
+    } else if (i >= s.sections.length - 1) {
+      return null;
+    } else {
+      index = i + 1;
+      target = alignedTop(s, index);
     }
-    if (i >= s.sections.length - 1) return null;
-    return { scrollTo: clampMin(s.sections[i + 1].top - s.headerOffset), index: i + 1 };
   } else {
-    const topVisible = sec.top >= s.scrollY + s.headerOffset - EDGE;
-    if (!topVisible) {
-      const target = Math.max(s.scrollY - s.viewport * STEP, sec.top - s.headerOffset);
-      return { scrollTo: clampMin(target), index: i };
+    const atTop = s.scrollY <= alignedTop(s, i) + EDGE;
+    if (!atTop) {
+      target = Math.max(s.scrollY - s.viewport * STEP, alignedTop(s, i));
+      index = i;
+    } else if (i <= 0) {
+      return null;
+    } else {
+      index = i - 1;
+      target = alignedTop(s, index);
     }
-    if (i <= 0) return null;
-    return { scrollTo: clampMin(s.sections[i - 1].top - s.headerOffset), index: i - 1 };
   }
+
+  target = Math.max(0, target);
+  if (Math.abs(target - s.scrollY) < EDGE) return null; // no-op = sınır
+  return { scrollTo: target, index };
 }
