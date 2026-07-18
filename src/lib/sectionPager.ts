@@ -64,3 +64,67 @@ export function nextTarget(s: PagerState): PagerTarget | null {
   if (Math.abs(target - s.scrollY) < EDGE) return null; // no-op = sınır
   return { scrollTo: target, index };
 }
+
+export interface PagerLenis {
+  scroll: number;
+  scrollTo: (target: number, opts?: { duration?: number; offset?: number; easing?: (t: number) => number }) => void;
+}
+export interface SectionPagerOptions {
+  lenis: PagerLenis;
+  getSections: () => HTMLElement[];
+  headerOffset?: number;
+  duration?: number;
+  debounceMs?: number;
+  onIndex?: (index: number) => void;
+}
+
+export function createSectionPager(opts: SectionPagerOptions): { destroy(): void } {
+  const headerOffset = opts.headerOffset ?? 80;
+  const duration = opts.duration ?? 0.9;
+  const debounceMs = opts.debounceMs ?? 700;
+  let locked = false;
+
+  const rects = (): SectionRect[] =>
+    opts.getSections().map((el) => {
+      const r = el.getBoundingClientRect();
+      return { top: r.top + window.scrollY, height: r.height };
+    });
+
+  const go = (direction: 1 | -1) => {
+    if (locked) return;
+    const t = nextTarget({
+      scrollY: window.scrollY,
+      viewport: window.innerHeight,
+      headerOffset,
+      sections: rects(),
+      direction,
+    });
+    if (!t) return;
+    locked = true;
+    opts.lenis.scrollTo(t.scrollTo, { duration });
+    opts.onIndex?.(t.index);
+    window.setTimeout(() => { locked = false; }, duration * 1000 + debounceMs);
+  };
+
+  const onWheel = (e: WheelEvent) => {
+    if (Math.abs(e.deltaY) < 4) return;
+    e.preventDefault();
+    go(e.deltaY > 0 ? 1 : -1);
+  };
+  const onKey = (e: KeyboardEvent) => {
+    const tag = (e.target as HTMLElement)?.tagName;
+    if (tag === "INPUT" || tag === "TEXTAREA" || (e.target as HTMLElement)?.isContentEditable) return;
+    if (e.key === "ArrowDown" || e.key === "PageDown" || e.key === " ") { e.preventDefault(); go(1); }
+    else if (e.key === "ArrowUp" || e.key === "PageUp") { e.preventDefault(); go(-1); }
+  };
+
+  window.addEventListener("wheel", onWheel, { passive: false });
+  window.addEventListener("keydown", onKey);
+
+  return {
+    destroy() {
+      window.removeEventListener("wheel", onWheel);
+      window.removeEventListener("keydown", onKey);
+    },
+  };
+}
