@@ -121,24 +121,24 @@ export function createSectionPager(opts: SectionPagerOptions): { destroy(): void
       return { top: r.top + window.scrollY, height: r.height };
     });
 
-  const go = (direction: 1 | -1) => {
-    // nextTarget her seferinde gerçek window.scrollY okur → scrollbar/find/deep-link
-    // ile pozisyon değişse bile bayat index'e ışınlanma olmaz (Fable ccg).
-    const t = nextTarget({
+  // nextTarget her seferinde gerçek window.scrollY okur → scrollbar/find/deep-link
+  // ile pozisyon değişse bile bayat index'e ışınlanma olmaz (Fable ccg).
+  const compute = (direction: 1 | -1): PagerTarget | null =>
+    nextTarget({
       scrollY: window.scrollY,
       viewport: window.innerHeight,
       headerOffset,
       sections: rects(),
       direction,
     });
-    if (!t) return;
+
+  const go = (t: PagerTarget) => {
     locked = true;
     opts.lenis.scrollTo(t.scrollTo, {
       duration,
       lock: true,
       // Kilit = animasyon + kısa SABİT cooldown. Wheel bunu RESET ETMEZ →
-      // sürekli scroll'da her ~(duration+cooldown)'da bir advance. (Eski hâl:
-      // her wheel timer'ı sıfırlıyordu → sürekli scroll = süresiz kilit.)
+      // sürekli scroll'da her ~(duration+cooldown)'da bir advance.
       onComplete: () => {
         if (unlockTimer !== undefined) clearTimeout(unlockTimer);
         unlockTimer = window.setTimeout(() => {
@@ -152,11 +152,18 @@ export function createSectionPager(opts: SectionPagerOptions): { destroy(): void
   const onWheel = (e: WheelEvent) => {
     if (e.ctrlKey) return; // pinch-zoom'a dokunma
     if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return; // yatay gesture
-    e.preventDefault(); // uygun dikey wheel'i daima yut (Lenis zaten çekildi)
-    if (locked) return; // kilitliyken yut — unlock timer'ını RESET ETME (yapışma yok)
+    if (locked) {
+      e.preventDefault(); // geçiş sırasında yut (unlock timer'ını RESET ETME)
+      return;
+    }
     const d = normalizeDeltaY(e);
     if (Math.abs(d) < fireThreshold) return; // mikro titreme
-    go(d > 0 ? 1 : -1);
+    const t = compute(d > 0 ? 1 : -1);
+    // Sınır (ör. son bölümde aşağı → Footer): preventDefault YOK → native scroll
+    // footer'a inebilsin (Codex P1). Yalnız gerçek bir hedef varken paging yap.
+    if (!t) return;
+    e.preventDefault();
+    go(t);
   };
 
   const onKey = (e: KeyboardEvent) => {
@@ -164,13 +171,14 @@ export function createSectionPager(opts: SectionPagerOptions): { destroy(): void
     const tag = el?.tagName;
     if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || el?.isContentEditable) return;
     if (locked) return;
-    if (e.key === "ArrowDown" || e.key === "PageDown" || e.key === " ") {
-      e.preventDefault();
-      go(1);
-    } else if (e.key === "ArrowUp" || e.key === "PageUp") {
-      e.preventDefault();
-      go(-1);
-    }
+    let dir: 1 | -1 | 0 = 0;
+    if (e.key === "ArrowDown" || e.key === "PageDown" || e.key === " ") dir = 1;
+    else if (e.key === "ArrowUp" || e.key === "PageUp") dir = -1;
+    if (!dir) return;
+    const t = compute(dir);
+    if (!t) return; // sınır → native (footer / klavye scroll)
+    e.preventDefault();
+    go(t);
   };
 
   window.addEventListener("wheel", onWheel, { passive: false });
