@@ -1,5 +1,6 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { WORLD_DOTS } from "../lib/worldDots";
 
 interface Location {
   id: string;
@@ -45,6 +46,7 @@ export default function WorldMap() {
   // beginElement() ile tetiklenir (aşağıdaki startRoutes).
   const animateRefs = useRef<Array<SVGAnimateElement | null>>([]);
   const startedRef = useRef(false);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   // Rotalar SADECE harita viewport'a girince çizilir (Codex P2 fix). Önceden
   // <animate begin="indefinite; {i*200}ms"> ile ${i*200}ms clause'u document-load'dan
@@ -62,20 +64,50 @@ export default function WorldMap() {
     });
   };
 
+  // Framer'ın onViewportEnter'ı pager (Lenis programatik scroll) ile güvenilir
+  // tetiklenmiyordu → rotalar çizilmeden kalıyordu. Düz IntersectionObserver ile garanti.
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          startRoutes();
+          io.disconnect();
+        }
+      },
+      { threshold: 0.2 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <motion.div
+      ref={containerRef}
       className="relative aspect-[2/1] w-full"
       onViewportEnter={startRoutes}
       viewport={{ once: true }}
     >
       <svg viewBox="0 0 1000 500" className="h-full w-full" fill="none">
-        {/* Simplified continent outlines */}
-        <path d="M150,120 Q200,100 250,110 Q300,100 350,120 Q330,180 300,200 Q250,220 200,210 Q170,180 150,120Z" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.1)" strokeWidth="0.5" />
-        <path d="M220,230 Q260,220 300,240 Q310,300 290,350 Q260,370 240,340 Q220,300 220,230Z" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.1)" strokeWidth="0.5" />
-        <path d="M420,80 Q500,60 580,80 Q600,120 580,160 Q520,200 460,180 Q430,140 420,80Z" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.1)" strokeWidth="0.5" />
-        <path d="M460,200 Q520,190 560,220 Q580,280 560,320 Q520,340 480,310 Q460,260 460,200Z" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.1)" strokeWidth="0.5" />
-        <path d="M580,150 Q650,120 720,140 Q750,180 740,220 Q700,240 660,220 Q620,200 580,150Z" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.1)" strokeWidth="0.5" />
-        <path d="M740,160 Q800,140 860,160 Q880,200 860,240 Q820,260 780,240 Q750,210 740,160Z" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.1)" strokeWidth="0.5" />
+        {/* Dotted world map — gerçek coğrafyadan üretilen noktalar (dotted-map,
+            build-time; koordinatlar worldDots.ts'e gömülü, 1000x500 viewBox). Kıtalar
+            noktalarla çizilir; kenarlarda radial fade. Rotalar + şehir node'ları üstüne biner. */}
+        <defs>
+          <radialGradient id="wm-fade" cx="50%" cy="50%" r="80%">
+            <stop offset="0%" stop-color="white" stop-opacity="1" />
+            <stop offset="100%" stop-color="white" stop-opacity="0.65" />
+          </radialGradient>
+          <mask id="wm-mask">
+            <rect width="1000" height="500" fill="url(#wm-fade)" />
+          </mask>
+        </defs>
+        <g mask="url(#wm-mask)">
+          {WORLD_DOTS.map(([x, y], idx) => (
+            <circle key={idx} cx={x} cy={y} r={2} fill="rgba(17,17,17,0.18)" />
+          ))}
+        </g>
 
         {/* Trade routes — TradeRoute primitive paterni inline (Phase 6 Task 6.2).
             Viewport gating BaseLayout page-observer'ı yerine bu component'te
@@ -130,8 +162,7 @@ export default function WorldMap() {
         <motion.div
           key={loc.id}
           initial={{ scale: 0, opacity: 0 }}
-          whileInView={{ scale: 1, opacity: 1 }}
-          viewport={{ once: true }}
+          animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.5 + i * 0.1 }}
           className="absolute"
           style={{ left: `${loc.x}%`, top: `${loc.y}%`, transform: "translate(-50%, -50%)" }}
@@ -140,6 +171,11 @@ export default function WorldMap() {
         >
           <div className="absolute -inset-3 rounded-full bg-[#22C55E]/20 animate-pulse" />
           <div className="relative h-3 w-3 rounded-full bg-[#22C55E] cursor-pointer" />
+
+          {/* Kalıcı şehir etiketi (hover'da tooltip country+type ekler) */}
+          <span className="pointer-events-none absolute left-1/2 top-full mt-1.5 -translate-x-1/2 whitespace-nowrap text-[10px] font-medium tracking-wide text-[#1A1A1A]/75">
+            {loc.city}
+          </span>
 
           <AnimatePresence>
             {active === loc.id && (
