@@ -158,14 +158,16 @@ const TickCounter = forwardRef<
   }));
 
   const formatted = formatValue(display, format, locale, currency, precision);
+  // SR etiketi nihai hedefe sabit: aria-live yok → sayaç her frame değişse de
+  // ekran okuyucu tek anlamlı değeri okur, frame-frame spam etmez (Codex P1).
+  const finalLabel = formatValue(target, format, locale, currency, precision) + suffix;
 
   return (
     <span
       ref={viewRef as RefObject<HTMLSpanElement>}
       className={className}
       style={{ fontVariantNumeric: "tabular-nums" }}
-      aria-label={ariaLabel ?? formatted}
-      aria-live="polite"
+      aria-label={ariaLabel ?? finalLabel}
     >
       {formatted + suffix}
     </span>

@@ -72,10 +72,16 @@ describe("TickCounter", () => {
     expect(screen.getByText(/1,000/)).toBeTruthy();
   });
 
-  it("uses aria-label fallback to the formatted value when none is provided", () => {
+  it("uses aria-label fallback to the final target value when none is provided", () => {
     const { container } = render(<TickCounter target={500} />);
     const span = container.querySelector("span");
     expect(span?.getAttribute("aria-label")).toBe("500");
+  });
+
+  it("does not use aria-live (avoids per-frame screen-reader spam)", () => {
+    const { container } = render(<TickCounter target={500} />);
+    const span = container.querySelector("span");
+    expect(span?.getAttribute("aria-live")).toBeNull();
   });
 
   it("applies tabular-nums fontVariantNumeric for stable column width", () => {

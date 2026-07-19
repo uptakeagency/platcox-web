@@ -16,11 +16,15 @@
  */
 
 import { spawnSync } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, rmSync } from "node:fs";
 
 const TARGET = process.env.AXE_TARGET ?? "http://localhost:4321/";
 const OUTPUT = process.env.AXE_OUTPUT ?? "/tmp/axe-motion.json";
 const TAGS = process.env.AXE_TAGS ?? "wcag21aa";
+
+// Bir önceki koşunun çıktısını sil: axe çöktüğünde (status!=0, dosya üretmeden)
+// bayat OUTPUT'un başarısız denetimi maskeleyip false success üretmesini önler (Codex P1).
+rmSync(OUTPUT, { force: true });
 
 console.log(`[axe] Running against ${TARGET} (tags: ${TAGS})`);
 
