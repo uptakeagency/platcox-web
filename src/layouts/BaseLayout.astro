@@ -112,7 +112,7 @@ const jsonLd = {
     <!-- Lenis smooth scroll: site-wide momentum scrolling. reduced-motion
          kullanıcılarında native scroll'a düşer. -->
     <script>
-      import { getLenis } from "../lib/lenisSingleton";
+      import { getLenis, setPagerOwnsWheel } from "../lib/lenisSingleton";
       import { createSectionPager } from "../lib/sectionPager";
       const reduceMotion = window.matchMedia?.(
         "(prefers-reduced-motion: reduce)",
@@ -120,14 +120,16 @@ const jsonLd = {
       const desktop = window.matchMedia?.(
         "(min-width:768px) and (pointer:fine)",
       ).matches;
+      const hasPager = "__sectionPager" in window;
       if (!reduceMotion) {
         const lenis = getLenis();
-        if (lenis && desktop) {
-          createSectionPager({
+        if (lenis && desktop && !hasPager) {
+          (window as any).__sectionPager = createSectionPager({
             lenis,
             getSections: () =>
               Array.from(document.querySelectorAll("main > section")),
             headerOffset: 80,
+            setWheelOwnership: setPagerOwnsWheel,
           });
         }
       }

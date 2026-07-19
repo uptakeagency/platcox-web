@@ -45,3 +45,16 @@ test("uzun bölümde içerideyken up → iç-yukarı adım (komşuya atlamaz)", 
   expect(r?.index).toBe(1);
   expect(r?.scrollTo).toBe(Math.max(1200 - 800 * 0.85, 520)); // max(520,520)=520
 });
+
+test("tam-viewport bölüm (header offset'li, aligned) down → intra DEĞİL, sonraki", () => {
+  // min-h-screen bölüm: height == viewport. Fixed header altını ~80px gizler ama
+  // bölüm "gerçekten uzun" (>1.15×) değil → tek scroll'da sonrakine geçmeli.
+  // (Bug: header offset her bölümü 2-scroll yapıyordu.)
+  const T = [
+    { top: 0, height: 800 },
+    { top: 800, height: 800 },
+    { top: 1600, height: 800 },
+  ];
+  const r = nextTarget({ viewport: 800, headerOffset: 80, sections: T, scrollY: 720, direction: 1 });
+  expect(r).toEqual({ scrollTo: 1520, index: 2 }); // section2 hizalı (1600-80)
+});
