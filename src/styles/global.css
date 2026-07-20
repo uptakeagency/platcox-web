@@ -71,7 +71,33 @@
 
 @layer components {
   .section-padding {
-    @apply py-24 px-6 md:py-[200px] md:px-8;
+    @apply py-16 px-6 md:py-24 md:px-8;
+  }
+
+  /* Slider: her bölüm bir ekranı doldurur, içerik dikey ortalanır → paging
+     tek-slide olur (Hero + MissionCard zaten min-h; diğerlerini de hizalar).
+     Eski 400px section-padding bölümleri 1.2–1.56× ekran yapıyordu; kaldırıldı. */
+  /* Fixed header (~88px) için anchor/hash atlamaları header altına insin
+     (pager zaten scrollTo'da header offset uyguluyor; bu native jump'lar için). */
+  html {
+    scroll-padding-top: 88px;
+  }
+
+  main > section {
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  /* İçeriği bir ekrandan uzun bölümler (janus/clients): ortalamak üstte boşluk +
+     altta kesim yaratıyor → üste hizala + padding'i kıs. İçerik header'ın hemen
+     altından başlar (üst boşluk gider); kalan alt kısmı pager intra-step ile gezer. */
+  main > section#janus,
+  main > section#clients {
+    justify-content: flex-start;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
   }
 
   .section-label {

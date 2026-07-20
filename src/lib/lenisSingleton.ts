@@ -3,6 +3,14 @@ import Lenis from "lenis";
 let instance: Lenis | null = null;
 let rafId: number | null = null;
 
+// Section pager aktifken (yalnız anasayfa/masaüstü) Lenis wheel'i YUTMAZ —
+// pager tek sahip olur, Lenis sadece programatik scrollTo animasyonunu oynatır.
+// Haber vb. sayfalarında pager kurulmaz → flag false → Lenis normal smooth wheel.
+let pagerOwnsWheel = false;
+export function setPagerOwnsWheel(v: boolean): void {
+  pagerOwnsWheel = v;
+}
+
 /**
  * Returns the app-wide Lenis instance (lazy-initialized on first call).
  *
@@ -24,6 +32,9 @@ export function getLenis(): Lenis | null {
     smoothWheel: true,
     syncTouch: true,
     touchMultiplier: 1.2,
+    // Pager sahipse wheel'i Lenis'e verme (çifte-tüketimi keser) — Codex ccg.
+    virtualScroll: ({ event }: { event: Event }) =>
+      !(pagerOwnsWheel && event.type === "wheel"),
   });
 
   const loop = (time: number) => {

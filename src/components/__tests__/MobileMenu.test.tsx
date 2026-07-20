@@ -28,8 +28,8 @@ describe("MobileMenu", () => {
     render(<MobileMenu />);
     fireEvent.click(screen.getByRole("button", { name: "Toggle menu" }));
 
-    // Sustainability + News bölümleri kaldırıldı → nav 3 öğe
-    const expectedLinks = ["About", "Solutions", "Contact"];
+    // Desktop Header ile hizalı; Sustainability + News kaldırıldı
+    const expectedLinks = ["About", "Philosophy", "Solutions", "Locations", "Contact"];
     for (const label of expectedLinks) {
       expect(screen.getByText(label)).toBeTruthy();
     }

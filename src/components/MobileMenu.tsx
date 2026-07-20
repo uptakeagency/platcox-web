@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
+// Desktop Header nav'ıyla hizalı (Codex P2)
 const navLinks = [
   { label: "About", href: "#about" },
+  { label: "Philosophy", href: "#philosophy" },
   { label: "Solutions", href: "#solutions" },
+  { label: "Locations", href: "#locations" },
   { label: "Contact", href: "#contact" },
 ];
 

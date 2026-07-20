@@ -59,7 +59,9 @@ export default function OntologyGraph({
       viewBox="0 0 200 120"
       className={className}
       aria-label={ariaLabel}
-      role="img"
+      // role="group": interaktif node'ları (role="button") erişilebilir tutar;
+      // role="img" olsaydı alt ağacı sunumsallaştırıp AT'ten gizlerdi (Codex P1).
+      role="group"
       data-detail-open={openId ? "true" : "false"}
     >
       {edges.map((edge, i) => {
