@@ -205,16 +205,17 @@ const byId = new Map(nodes.map((n) => [n.id, n]));
      Şema kalan boşluğa göre daralır (34rem = başlık + kartlar + boşluklar),
      11rem alt sınırı düğüm etiketlerini okunur tutar.
 
-     700px'ten alçak ekranlarda (yüksek tarayıcı zoom'u dahil) içerik hiçbir
-     küçültmeyle sığmıyor. Orada sığdırmayı bırakıp bölümün doğal boyuna
-     dönmesi gerekir: pager'ın "uzun bölüm" eşiğini aşar ve alt kartlar
-     intra-step ile erişilebilir kalır. Sığdırmayı zorlamak kartları
-     ulaşılamaz kılıyordu (Codex P2). */
+     Sığdırma yalnızca 900px+ genişlik ve 700px+ yükseklikte denenir. Bu
+     sınırların dışında (alçak ekran, yüksek tarayıcı zoom'u, ya da 768-899px
+     dar masaüstünde metnin fazladan satıra sarması) içerik hiçbir küçültmeyle
+     sığmıyor; sığdırmayı zorlamak bölümü pager'ın "uzun" eşiğinin altında
+     tutup alt kartları ulaşılamaz kılıyordu (Codex P2 ×2). Sınır dışında
+     bölüm doğal boyuna döner ve kartlar intra-step ile erişilir. */
   .janus-gap {
     margin-top: 4rem;
   }
 
-  @media (min-width: 768px) and (min-height: 700px) {
+  @media (min-width: 900px) and (min-height: 700px) {
     .janus-gap {
       margin-top: clamp(1rem, 3svh, 2.5rem);
     }

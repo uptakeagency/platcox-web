@@ -80,10 +80,13 @@ const reasons = [
      ekran alanına sığmalı. Önce ayırıcı boşluklar viewport'a göre kısılır,
      yetmezse video oranını koruyarak daralır (aspect-ratio + auto genişlik).
 
-     700px altında hiçbir küçültmeyle sığmıyor: orada sığdırmayı bırakıp
-     bölümün doğal boyuna dönmesi gerekir, yoksa pager'ın "uzun bölüm" eşiğini
-     aşamaz ve alt listeler erişilemez kalır (Janus'ta yaşanan Codex P2). */
-  @media (min-width: 768px) and (min-height: 700px) {
+     Sığdırma yalnızca 900px+ genişlik ve 700px+ yükseklikte denenir. Dar
+     masaüstünde (768-899px) iki sütun sıkışıp metin fazladan satıra sarıyor,
+     içerik yine taşıyor ama bölüm pager'ın "uzun" eşiğini aşmadığı için alt
+     listeler erişilemez kalıyordu (Codex P2, 768x700'de ölçüldü: 74px taşma).
+     Sınırların dışında bölüm doğal boyuna döner, eşiği aşar ve intra-step ile
+     gezilir. */
+  @media (min-width: 900px) and (min-height: 700px) {
     .clients-media {
       max-height: min(24rem, calc(100svh - 32rem));
       width: auto;

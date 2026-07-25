@@ -84,7 +84,10 @@
   }
 
   main > section {
-    min-height: 100svh;
+    /* Fixed header'ı düş: bölüm, pager'ın hizaladığı GÖRÜNÜR alan kadar olsun.
+       100svh iken her bölüm görünür alandan 88px uzundu → alt kenarı kesiliyor
+       ve pager'ın "uzun bölüm" ölçütü kaba bir toleransa muhtaç kalıyordu. */
+    min-height: calc(100svh - 88px);
     display: flex;
     flex-direction: column;
     justify-content: center;
