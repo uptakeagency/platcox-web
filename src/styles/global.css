@@ -100,6 +100,15 @@
     padding-bottom: 2rem;
   }
 
+  /* Janus tek slide: pager bölümü header'ın hemen altına hizalıyor, 2rem'lik
+     üst boşluk kicker'ı sabit çubuğun arkasında bırakıyordu (112px vs 81px).
+     3rem ile etiket her ekranda çubuğun altında kalır. */
+  @media (min-width: 768px) {
+    main > section#janus {
+      padding-top: 3rem;
+    }
+  }
+
   .section-label {
     @apply text-[11px] font-medium uppercase tracking-[3px] text-muted mb-4;
   }

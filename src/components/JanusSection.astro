@@ -39,7 +39,7 @@ const byId = new Map(nodes.map((n) => [n.id, n]));
     </ScrollReveal>
 
     <ScrollReveal client:idle animation="fade-up" delay={100}>
-      <div class="mt-16">
+      <div class="janus-gap">
         <svg
           viewBox="0 0 670 320"
           class="janus-graph w-full max-w-4xl mx-auto"
@@ -160,7 +160,7 @@ const byId = new Map(nodes.map((n) => [n.id, n]));
     </ScrollReveal>
 
     <ScrollReveal client:idle animation="fade-up" delay={200}>
-      <div class="mt-16 grid gap-6 md:grid-cols-3">
+      <div class="janus-gap grid gap-6 md:grid-cols-3">
         <div class="rounded-lg border border-border p-6">
           <p class="text-[11px] font-medium uppercase tracking-[2px] text-muted">
             Belge / sevkiyat
@@ -201,6 +201,23 @@ const byId = new Map(nodes.map((n) => [n.id, n]));
 </section>
 
 <style>
+  /* Tek slide bütçesi: bölüm, sabit header düşülmüş ekran alanına sığmalı.
+     Şema kalan boşluğa göre daralır (34rem = başlık + kartlar + boşluklar),
+     11rem alt sınırı düğüm etiketlerini okunur tutar. */
+  .janus-gap {
+    margin-top: 4rem;
+  }
+
+  @media (min-width: 768px) {
+    .janus-gap {
+      margin-top: clamp(1rem, 3svh, 2.5rem);
+    }
+
+    .janus-graph {
+      max-height: min(26rem, max(11rem, calc(100svh - 34rem)));
+    }
+  }
+
   /* Edge dash flow */
   @keyframes janus-flow {
     to {
