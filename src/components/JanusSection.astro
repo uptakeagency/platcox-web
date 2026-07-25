@@ -203,12 +203,18 @@ const byId = new Map(nodes.map((n) => [n.id, n]));
 <style>
   /* Tek slide bütçesi: bölüm, sabit header düşülmüş ekran alanına sığmalı.
      Şema kalan boşluğa göre daralır (34rem = başlık + kartlar + boşluklar),
-     11rem alt sınırı düğüm etiketlerini okunur tutar. */
+     11rem alt sınırı düğüm etiketlerini okunur tutar.
+
+     700px'ten alçak ekranlarda (yüksek tarayıcı zoom'u dahil) içerik hiçbir
+     küçültmeyle sığmıyor. Orada sığdırmayı bırakıp bölümün doğal boyuna
+     dönmesi gerekir: pager'ın "uzun bölüm" eşiğini aşar ve alt kartlar
+     intra-step ile erişilebilir kalır. Sığdırmayı zorlamak kartları
+     ulaşılamaz kılıyordu (Codex P2). */
   .janus-gap {
     margin-top: 4rem;
   }
 
-  @media (min-width: 768px) {
+  @media (min-width: 768px) and (min-height: 700px) {
     .janus-gap {
       margin-top: clamp(1rem, 3svh, 2.5rem);
     }
