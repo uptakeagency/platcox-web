@@ -1,4 +1,6 @@
 ---
+import { LINKEDIN_URL } from "../lib/siteLinks";
+
 const year = new Date().getFullYear();
 ---
 
@@ -8,7 +10,7 @@ const year = new Date().getFullYear();
       {year} &copy; platco<span class="text-accent">X</span>
     </p>
     <a
-      href="https://www.linkedin.com/in/cemtunakan"
+      href={LINKEDIN_URL}
       target="_blank"
       rel="noopener noreferrer"
       class="text-sm text-muted transition-colors hover:text-foreground"

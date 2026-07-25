@@ -1,6 +1,7 @@
 ---
 import ScrollReveal from "./motion/ScrollReveal";
 import ContactForm from "./ContactForm.tsx";
+import { LINKEDIN_URL } from "../lib/siteLinks";
 ---
 
 <section id="contact" class="section-padding">
@@ -44,7 +45,7 @@ import ContactForm from "./ContactForm.tsx";
           <div>
             <p class="text-sm font-medium text-foreground">Social</p>
             <a
-              href="https://www.linkedin.com/in/cemtunakan"
+              href={LINKEDIN_URL}
               target="_blank"
               rel="noopener noreferrer"
               class="mt-2 inline-block text-muted hover:text-foreground transition-colors"

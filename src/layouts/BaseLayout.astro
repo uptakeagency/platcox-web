@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+import { LINKEDIN_URL } from "../lib/siteLinks";
 
 interface Props {
   title?: string;
@@ -28,7 +29,7 @@ const jsonLd = {
         "@type": "ImageObject",
         url: "https://www.platcox.com/favicon.svg",
       },
-      sameAs: ["https://www.linkedin.com/in/cemtunakan"],
+      sameAs: [LINKEDIN_URL],
       contactPoint: {
         "@type": "ContactPoint",
         telephone: "+90-212-288-34-94",
