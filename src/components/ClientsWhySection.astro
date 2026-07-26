@@ -20,7 +20,7 @@ const reasons = [
   <div class="container-content">
     <div class="grid gap-16 md:grid-cols-2 md:items-center">
       <ScrollReveal client:idle animation="slide-left">
-        <div class="aspect-[4/3] overflow-hidden bg-surface-alt">
+        <div class="clients-media aspect-[4/3] overflow-hidden bg-surface-alt">
           <LazyVideo src="/videos/business.mp4" class="h-full w-full object-cover" />
         </div>
       </ScrollReveal>
@@ -41,14 +41,14 @@ const reasons = [
       </ScrollReveal>
     </div>
 
-    <div class="mt-32 border-t border-border pt-20">
+    <div class="clients-divider mt-32 border-t border-border pt-20">
       <ScrollReveal client:idle animation="fade-up">
         <h2 class="text-3xl font-light tracking-tight md:text-4xl">
           Because real influence happens off-stage.
         </h2>
       </ScrollReveal>
 
-      <div class="mt-12 grid gap-12 md:grid-cols-2">
+      <div class="clients-lists mt-12 grid gap-12 md:grid-cols-2">
         <ScrollReveal client:idle animation="fade-up" delay={100}>
           <div>
             <p class="section-label">WHO WE WORK WITH</p>
@@ -74,3 +74,32 @@ const reasons = [
     </div>
   </div>
 </section>
+
+<style>
+  /* Tek slide bütçesi (Janus ile aynı yaklaşım): bölüm, sabit header düşülmüş
+     ekran alanına sığmalı. Önce ayırıcı boşluklar viewport'a göre kısılır,
+     yetmezse video oranını koruyarak daralır (aspect-ratio + auto genişlik).
+
+     Sığdırma yalnızca 900px+ genişlik ve 700px+ yükseklikte denenir. Dar
+     masaüstünde (768-899px) iki sütun sıkışıp metin fazladan satıra sarıyor,
+     içerik yine taşıyor ama bölüm pager'ın "uzun" eşiğini aşmadığı için alt
+     listeler erişilemez kalıyordu (Codex P2, 768x700'de ölçüldü: 74px taşma).
+     Sınırların dışında bölüm doğal boyuna döner, eşiği aşar ve intra-step ile
+     gezilir. */
+  @media (min-width: 900px) and (min-height: 700px) {
+    .clients-media {
+      max-height: min(24rem, calc(100svh - 32rem));
+      width: auto;
+      margin-inline: auto;
+    }
+
+    .clients-divider {
+      margin-top: clamp(2rem, 6svh, 8rem);
+      padding-top: clamp(1.5rem, 4svh, 5rem);
+    }
+
+    .clients-lists {
+      margin-top: clamp(1rem, 3svh, 3rem);
+    }
+  }
+</style>

@@ -16,7 +16,9 @@ import NewsTicker from "./NewsTicker.astro";
 <style>
   .mission-card {
     position: relative;
-    min-height: 100vh;
+    /* Fixed header düşülmüş görünür alan — 100vh olduğunda bölüm alanı 88px
+       aşıyor, pager de onu "uzun" sayıp fazladan boş bir adım ekliyordu. */
+    min-height: calc(100svh - 88px);
     background: #fff;
     display: flex;
     flex-direction: column;

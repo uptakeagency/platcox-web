@@ -46,15 +46,29 @@ test("uzun bölümde içerideyken up → iç-yukarı adım (komşuya atlamaz)", 
   expect(r?.scrollTo).toBe(Math.max(1200 - 800 * 0.85, 520)); // max(520,520)=520
 });
 
-test("tam-viewport bölüm (header offset'li, aligned) down → intra DEĞİL, sonraki", () => {
-  // min-h-screen bölüm: height == viewport. Fixed header altını ~80px gizler ama
-  // bölüm "gerçekten uzun" (>1.15×) değil → tek scroll'da sonrakine geçmeli.
-  // (Bug: header offset her bölümü 2-scroll yapıyordu.)
+test("görünür alanı taşan bölüm (1.15× eşiğinin altında) → iç-adım, komşuya atlamaz", () => {
+  // Kapan bandı: bölüm görünür alandan (viewport-header = 620) uzun ama
+  // viewport*1.15 = 805 eşiğinin altında. Eski ölçüt bunu "kısa" sayıp
+  // doğrudan komşuya atlıyordu → bölümün alt kısmı hiç görüntülenemiyordu.
   const T = [
-    { top: 0, height: 800 },
-    { top: 800, height: 800 },
-    { top: 1600, height: 800 },
+    { top: 0, height: 700 },
+    { top: 700, height: 787 },
+    { top: 1487, height: 700 },
   ];
-  const r = nextTarget({ viewport: 800, headerOffset: 80, sections: T, scrollY: 720, direction: 1 });
-  expect(r).toEqual({ scrollTo: 1520, index: 2 }); // section2 hizalı (1600-80)
+  const r = nextTarget({ viewport: 700, headerOffset: 80, sections: T, scrollY: 620, direction: 1 });
+  expect(r?.index).toBe(1); // hâlâ aynı bölümde: alt kısmı göster
+  expect(r?.scrollTo).toBe(Math.min(620 + 700 * 0.85, 1487 - 700)); // min(1215, 787)=787
+});
+
+test("tek-ekran bölüm (görünür alan kadar) down → intra DEĞİL, sonraki", () => {
+  // Bölümlerin min-height'ı görünür alana eşit (calc(100svh - 88px)) → height
+  // 712, görünür alan 720. Tek-ekran bölüm iç-adım yapmamalı, tek scroll'da
+  // sonrakine geçmeli. (Bug: header offset her bölümü 2-scroll yapıyordu.)
+  const T = [
+    { top: 0, height: 712 },
+    { top: 712, height: 712 },
+    { top: 1424, height: 712 },
+  ];
+  const r = nextTarget({ viewport: 800, headerOffset: 80, sections: T, scrollY: 632, direction: 1 });
+  expect(r).toEqual({ scrollTo: 1344, index: 2 }); // section2 hizalı (1424-80)
 });

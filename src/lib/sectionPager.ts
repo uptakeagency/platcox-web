@@ -10,9 +10,12 @@ export interface PagerTarget { scrollTo: number; index: number }
 
 const STEP = 0.85; // iç-adım = viewport oranı (feel'de tune edilir)
 const EDGE = 4;    // px tolerans
-// Bölüm bu orandan UZUNSA "gerçekten uzun" sayılır → iç-adım yapar. Aksi hâlde
-// (tek-ekran min-h-screen bölüm) tek scroll'da komşuya geçer. Fixed header, bölüm
-// altının ~80px'ini gizlediği için tolerans şart; yoksa her bölüm 2 scroll ister.
+// Bölüm GÖRÜNÜR alandan (viewport - header) uzunsa "gerçekten uzun" sayılır →
+// iç-adım yapar; aksi hâlde tek scroll'da komşuya geçer. Ölçüt eskiden
+// viewport*1.15 idi: bölüm görünür alanı aşıp da bu oranın altında kaldığında
+// (ör. 700px viewport'ta 787px bölüm) "kısa" sayılıp komşuya atlanıyor, alt
+// kısmı hiç görüntülenemiyordu. Bölümlerin min-height'ı da görünür alana
+// eşitlendiği için (global.css) tek-ekran bölümler hâlâ tek scroll'da geçer.
 
 // Bir bölümün "hizalı" scroll konumu: üstü fixed header'ın altına oturur.
 // Pager daima buraya scrollTo eder; sınır tespiti de buna göre yapılır
@@ -35,7 +38,7 @@ function activeIndex(s: PagerState): number {
 export function nextTarget(s: PagerState): PagerTarget | null {
   const i = activeIndex(s);
   const sec = s.sections[i];
-  const isTall = sec.height > s.viewport * 1.15; // gerçekten uzun mu → intra-step
+  const isTall = sec.height > s.viewport - s.headerOffset + EDGE; // görünür alanı aşıyor mu → intra-step
   let target: number;
   let index: number;
 
