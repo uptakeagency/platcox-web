@@ -6,11 +6,11 @@ import TickCounter from "./motion/primitives/TickCounter";
 // Custom inline SVG (OntologyGraph yerine) — daha zengin görsel: halo,
 // flowing edges, gradient fill, breathing pulse.
 const nodes = [
-  { id: "src", x: 80, y: 130, label: "Sevkiyat", step: "01" },
-  { id: "inv", x: 250, y: 80, label: "Fatura", step: "02" },
-  { id: "doc", x: 420, y: 130, label: "Belge", step: "03" },
-  { id: "sub", x: 590, y: 80, label: "Gönderim", step: "04" },
-  { id: "adv", x: 335, y: 230, label: "Uzman incelemesi", step: "★" },
+  { id: "src", x: 80, y: 130, label: "Shipment", step: "01" },
+  { id: "inv", x: 250, y: 80, label: "Invoice", step: "02" },
+  { id: "doc", x: 420, y: 130, label: "Documents", step: "03" },
+  { id: "sub", x: 590, y: 80, label: "Submission", step: "04" },
+  { id: "adv", x: 335, y: 230, label: "Expert review", step: "★" },
 ];
 
 const edges: Array<{ from: string; to: string; via?: "primary" | "advisor" }> = [
@@ -32,9 +32,9 @@ const byId = new Map(nodes.map((n) => [n.id, n]));
         Janus
       </h2>
       <p class="mt-6 max-w-2xl text-muted">
-        İhracatı klavye işinden kurtaran operasyon platformu. Sevkiyat
-        hazırlığından gönderim onayına kadar tüm akışı yönetir; karmaşık
-        durumlarda kararı uzman incelemeye taşır.
+        The operations platform that takes export off the keyboard. It runs the
+        whole flow — from shipment prep to submission approval — and escalates
+        complex cases to expert review.
       </p>
     </ScrollReveal>
 
@@ -44,7 +44,7 @@ const byId = new Map(nodes.map((n) => [n.id, n]));
           viewBox="0 0 670 320"
           class="janus-graph w-full max-w-4xl mx-auto"
           role="img"
-          aria-label="Janus akışı: Sevkiyat, Fatura, Belge, Gönderim, Uzman incelemesi"
+          aria-label="Janus flow: Shipment, Invoice, Documents, Submission, Expert review"
         >
           <defs>
             <linearGradient id="janus-edge-primary" x1="0" y1="0" x2="1" y2="0">
@@ -163,36 +163,36 @@ const byId = new Map(nodes.map((n) => [n.id, n]));
       <div class="janus-gap grid gap-6 md:grid-cols-3">
         <div class="rounded-lg border border-border p-6">
           <p class="text-[11px] font-medium uppercase tracking-[2px] text-muted">
-            Belge / sevkiyat
+            Documents / shipment
           </p>
           <p class="mt-3 text-3xl font-light text-foreground">
             <TickCounter client:load target={47} suffix="+" durationMs={2400} />
           </p>
           <p class="mt-1 text-sm text-muted">
-            Fatura, gümrük beyanı, transit ve ekler — hepsi tek akışta.
+            Invoice, customs declaration, transit and attachments — all in one flow.
           </p>
         </div>
         <div class="rounded-lg border border-border p-6">
           <p class="text-[11px] font-medium uppercase tracking-[2px] text-muted">
-            Manuel iş yükü
+            Manual workload
           </p>
           <p class="mt-3 text-3xl font-light text-foreground">
             <TickCounter client:load target={0.94} format="percent" precision={0} durationMs={2400} />
-            <span class="text-base text-muted ml-2">azaltıldı</span>
+            <span class="text-base text-muted ml-2">reduced</span>
           </p>
           <p class="mt-1 text-sm text-muted">
-            Klavye dokunuşu yerine doğrulanmış otomasyon.
+            Verified automation instead of keystrokes.
           </p>
         </div>
         <div class="rounded-lg border border-border p-6">
           <p class="text-[11px] font-medium uppercase tracking-[2px] text-muted">
-            İşlem geçmişi
+            Audit trail
           </p>
           <p class="mt-3 text-3xl font-light text-foreground">
             <TickCounter client:load target={1428} durationMs={2400} />
           </p>
           <p class="mt-1 text-sm text-muted">
-            Her karar kalıcı kayıtla — sonradan geri izlenebilir.
+            Every decision is permanently logged — traceable after the fact.
           </p>
         </div>
       </div>
