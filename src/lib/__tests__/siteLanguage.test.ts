@@ -44,6 +44,20 @@ function componentFiles(): string[] {
     .map((f) => join(dir, f));
 }
 
+// Yayınlanan sayfalar. motion-playground dev-only bir primitive vitrini:
+// sitemap'ten hariç, hiçbir yerden link verilmiyor — Türkçe kalması bilinçli.
+const PAGE_EXCEPTIONS = ["motion-playground.astro"];
+
+function pageFiles(dir = join(SRC, "pages")): string[] {
+  const out: string[] = [];
+  for (const e of readdirSync(dir, { withFileTypes: true })) {
+    if (e.isDirectory()) out.push(...pageFiles(join(dir, e.name)));
+    else if (e.name.endsWith(".astro") && !PAGE_EXCEPTIONS.includes(e.name))
+      out.push(join(dir, e.name));
+  }
+  return out;
+}
+
 describe("site dili İngilizce", () => {
   it("bileşenlerde görünür Türkçe metin yok", () => {
     const bad: string[] = [];
@@ -63,6 +77,26 @@ describe("site dili İngilizce", () => {
         if (!/^(title|excerpt|category):/.test(line.trim())) continue;
         if (offenders([line]).length) bad.push(`${f}: ${line.trim()}`);
       }
+    }
+    expect(bad).toEqual([]);
+  });
+
+  it("yayınlanan sayfalarda görünür Türkçe metin yok", () => {
+    const bad: string[] = [];
+    for (const file of pageFiles()) {
+      const hits = offenders(visibleText(readFileSync(file, "utf8")));
+      if (hits.length) bad.push(`${file.split("/").pop()}: ${hits[0]}`);
+    }
+    expect(bad).toEqual([]);
+  });
+
+  // İçerik İngilizceye çevrildi; lang="tr" kalırsa ekran okuyucu İngilizce
+  // başlıkları Türkçe telaffuz kurallarıyla okur.
+  it("İngilizce içerik lang=\"tr\" ile işaretlenmiyor", () => {
+    const bad: string[] = [];
+    for (const file of [...componentFiles(), ...pageFiles()]) {
+      if (/lang\s*=\s*["']tr["']/.test(readFileSync(file, "utf8")))
+        bad.push(file.split("/").pop()!);
     }
     expect(bad).toEqual([]);
   });
