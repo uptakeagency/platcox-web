@@ -51,10 +51,12 @@ export default function FramePlayer({ frames, progressRef }: FramePlayerProps) {
     let rafId: number;
     let lastFrame = -1;
 
+    const FRAMES_END = 0.8; // frames complete at 80% of scroll; 80–100% holds last frame
     const draw = () => {
       const progress = progressRef.current ?? 0;
+      const framesProgress = Math.min(progress / FRAMES_END, 1);
       const frameIndex = Math.min(
-        Math.floor(progress * imagesRef.current.length),
+        Math.floor(framesProgress * imagesRef.current.length),
         imagesRef.current.length - 1
       );
 
