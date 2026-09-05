@@ -7,11 +7,11 @@ const { items, animate } = buildTicker(news);
 ---
 {items.length > 0 && (
   <nav class="ticker" aria-label="Latest news">
-    <div class="ticker__label"><span class="livedot" aria-hidden="true"></span><span>İSTANBUL</span></div>
+    <div class="ticker__label"><span class="livedot" aria-hidden="true"></span><span>ISTANBUL</span></div>
     <div class="ticker__track" data-animate={animate ? "true" : "false"}>
       <div class="marquee">
-        {items.map((i) => <a class="item" lang="tr" href={i.href}>{i.title}</a>)}
-        {animate && items.map((i) => <a class="item" lang="tr" href={i.href} aria-hidden="true" tabindex="-1">{i.title}</a>)}
+        {items.map((i) => <a class="item" href={i.href}>{i.title}</a>)}
+        {animate && items.map((i) => <a class="item" href={i.href} aria-hidden="true" tabindex="-1">{i.title}</a>)}
       </div>
     </div>
   </nav>

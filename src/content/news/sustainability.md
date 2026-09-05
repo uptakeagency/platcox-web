@@ -1,5 +1,5 @@
 ---
-title: "Herkesin kazandığı sürdürülebilir bir sistem yaratıyoruz"
+title: "Building a sustainable system where everyone wins"
 date: 2025-07-27
 category: "In Media"
 thumbnail: "/images/news/sustainability.jpg"
