@@ -5,8 +5,9 @@ import { join } from "node:path";
 const SRC = join(import.meta.dir, "..", "..");
 
 // Site dili İngilizce. Kod yorumları Türkçe kalır (proje konvansiyonu) — bu yüzden
-// tarama yorumları ve <style>/<script> bloklarını eler, yalnızca kullanıcıya görünen
-// metni denetler.
+// yorum/style/script bloklarını eleyip geri kalan HER satırı denetliyoruz: "görünür
+// metni çıkarmaya çalış" yerine "kod dışı hiçbir satırda Türkçe karakter kalmasın".
+// Bu, {expr} ile karışık metin düğümlerini ve frontmatter veri dizilerini de kapsar.
 const TR_CHARS = /[ğşıçöüĞŞİÇÖÜ]/;
 
 // Posta adresi yerel kalır: kargo ve harita için doğrusu bu.
@@ -18,30 +19,34 @@ function stripNonVisible(src: string): string {
     .replace(/<style[\s\S]*?<\/style>/g, "")
     .replace(/<script[\s\S]*?<\/script>/g, "")
     .replace(/\/\*[\s\S]*?\*\//g, "")
-    .replace(/^\s*\/\/.*$/gm, "");
+    .replace(/^\s*\/\/.*$/gm, "")
+    .replace(/\s\/\/.*$/gm, ""); // satır sonu yorumu; https:// gibi URL'ler bozulmaz
 }
 
-function visibleText(src: string): string[] {
-  const body = stripNonVisible(src);
+function checkedLines(src: string): string[] {
+  return stripNonVisible(src)
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean);
+}
+
+function offenders(lines: string[]): string[] {
+  return lines.filter((line) => {
+    let rest = line;
+    for (const a of ALLOWED) rest = rest.replaceAll(a, "");
+    return TR_CHARS.test(rest);
+  });
+}
+
+function componentFiles(dir = join(SRC, "components")): string[] {
   const out: string[] = [];
-  for (const m of body.matchAll(/>([^<>{}]+)</g)) out.push(m[1].trim());
-  for (const m of body.matchAll(
-    /(?:aria-label|alt|placeholder|title|label)\s*[:=]\s*["']([^"']+)["']/g,
-  )) out.push(m[1]);
-  return out.filter(Boolean);
-}
-
-function offenders(text: string[]): string[] {
-  return text.filter(
-    (t) => TR_CHARS.test(t) && !ALLOWED.some((a) => t.includes(a)),
-  );
-}
-
-function componentFiles(): string[] {
-  const dir = join(SRC, "components");
-  return readdirSync(dir)
-    .filter((f) => /\.(astro|tsx)$/.test(f))
-    .map((f) => join(dir, f));
+  for (const e of readdirSync(dir, { withFileTypes: true })) {
+    if (e.name === "__tests__") continue;
+    if (e.isDirectory()) out.push(...componentFiles(join(dir, e.name)));
+    else if (/\.(astro|tsx|ts)$/.test(e.name) && !e.name.includes(".test."))
+      out.push(join(dir, e.name));
+  }
+  return out;
 }
 
 // Yayınlanan sayfalar. motion-playground dev-only bir primitive vitrini:
@@ -58,11 +63,18 @@ function pageFiles(dir = join(SRC, "pages")): string[] {
   return out;
 }
 
+function layoutFiles(): string[] {
+  const dir = join(SRC, "layouts");
+  return readdirSync(dir)
+    .filter((f) => f.endsWith(".astro"))
+    .map((f) => join(dir, f));
+}
+
 describe("site dili İngilizce", () => {
   it("bileşenlerde görünür Türkçe metin yok", () => {
     const bad: string[] = [];
     for (const file of componentFiles()) {
-      const hits = offenders(visibleText(readFileSync(file, "utf8")));
+      const hits = offenders(checkedLines(readFileSync(file, "utf8")));
       if (hits.length) bad.push(`${file.split("/").pop()}: ${hits[0]}`);
     }
     expect(bad).toEqual([]);
@@ -83,8 +95,8 @@ describe("site dili İngilizce", () => {
 
   it("yayınlanan sayfalarda görünür Türkçe metin yok", () => {
     const bad: string[] = [];
-    for (const file of pageFiles()) {
-      const hits = offenders(visibleText(readFileSync(file, "utf8")));
+    for (const file of [...pageFiles(), ...layoutFiles()]) {
+      const hits = offenders(checkedLines(readFileSync(file, "utf8")));
       if (hits.length) bad.push(`${file.split("/").pop()}: ${hits[0]}`);
     }
     expect(bad).toEqual([]);
@@ -94,7 +106,7 @@ describe("site dili İngilizce", () => {
   // başlıkları Türkçe telaffuz kurallarıyla okur.
   it("İngilizce içerik lang=\"tr\" ile işaretlenmiyor", () => {
     const bad: string[] = [];
-    for (const file of [...componentFiles(), ...pageFiles()]) {
+    for (const file of [...componentFiles(), ...pageFiles(), ...layoutFiles()]) {
       if (/lang\s*=\s*["']tr["']/.test(readFileSync(file, "utf8")))
         bad.push(file.split("/").pop()!);
     }

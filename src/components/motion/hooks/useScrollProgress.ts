@@ -44,7 +44,7 @@ export function useScrollProgress(
       if (import.meta.env.DEV) {
         // eslint-disable-next-line no-console
         console.warn(
-          `[useScrollProgress] Trigger element bulunamadı: ${opts.triggerSelector}`,
+          `[useScrollProgress] Trigger element not found: ${opts.triggerSelector}`,
         );
       }
       return;

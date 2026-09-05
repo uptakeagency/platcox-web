@@ -43,7 +43,7 @@ function formatValue(
     ) {
       // eslint-disable-next-line no-console
       console.warn(
-        "TickCounter: format=\"currency\" verildi ama currency prop'u yok — decimal'a düşülüyor.",
+        "TickCounter: format=\"currency\" given without a currency prop; falling back to number.",
       );
       warnedNoCurrency = true;
     }
