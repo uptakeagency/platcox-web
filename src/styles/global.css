@@ -93,23 +93,13 @@
     justify-content: center;
   }
 
-  /* İçeriği bir ekrandan uzun bölümler (janus/clients): ortalamak üstte boşluk +
+  /* İçeriği bir ekrandan uzun bölümler (clients): ortalamak üstte boşluk +
      altta kesim yaratıyor → üste hizala + padding'i kıs. İçerik header'ın hemen
      altından başlar (üst boşluk gider); kalan alt kısmı pager intra-step ile gezer. */
-  main > section#janus,
   main > section#clients {
     justify-content: flex-start;
     padding-top: 2rem;
     padding-bottom: 2rem;
-  }
-
-  /* Janus tek slide: pager bölümü header'ın hemen altına hizalıyor, 2rem'lik
-     üst boşluk kicker'ı sabit çubuğun arkasında bırakıyordu (112px vs 81px).
-     3rem ile etiket her ekranda çubuğun altında kalır. */
-  @media (min-width: 768px) {
-    main > section#janus {
-      padding-top: 3rem;
-    }
   }
 
   .section-label {
