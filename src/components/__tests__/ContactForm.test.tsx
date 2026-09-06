@@ -1,4 +1,4 @@
-import { describe, it, expect, mock, afterEach, beforeAll, afterAll } from "bun:test";
+import { describe, it, expect, mock, spyOn, afterEach, beforeAll, afterAll } from "bun:test";
 import { render, screen, fireEvent, waitFor, cleanup } from "@testing-library/react";
 import ContactForm, { CONTACT_ENDPOINT, TURNSTILE_SCRIPT_SRC } from "../ContactForm";
 
@@ -8,6 +8,8 @@ const originalFormData = globalThis.FormData;
 
 // Bun'ın native FormData'sı jsdom'un HTMLFormElement'inden alan okuyamıyor;
 // jsdom'un kendi FormData'sı okuyabiliyor. Sadece bu dosyada değiştirip geri alıyoruz.
+// Global swap: Bun test dosyalarını tek process'te sırayla koşturduğu için güvenli
+// (afterAll'da eski değere dönülüyor); paralel koşumda diğer dosyaları etkilerdi.
 beforeAll(() => {
   globalThis.FormData = (window as unknown as { FormData: typeof FormData }).FormData;
 });
@@ -119,7 +121,7 @@ describe("ContactForm", () => {
   it("includes a hidden, non-required honeypot field", () => {
     render(<ContactForm turnstileSiteKey={TEST_KEY} />);
 
-    const honeypot = document.querySelector('input[name="company"]') as HTMLInputElement;
+    const honeypot = document.querySelector('input[name="contact_ref"]') as HTMLInputElement;
     expect(honeypot).toBeTruthy();
     expect(honeypot.required).toBe(false);
     expect(honeypot.tabIndex).toBe(-1);
@@ -144,6 +146,7 @@ describe("ContactForm", () => {
     expect(body.get("name")).toBe("Ada");
     expect(body.get("email")).toBe("ada@example.com");
     expect(body.get("message")).toBe("Hello there");
+    expect(body.get("contact_ref")).toBe("");
   });
 
   it("shows a success message and removes the form after a successful submit", async () => {
@@ -158,6 +161,7 @@ describe("ContactForm", () => {
   });
 
   it("shows an error and resets Turnstile when the server rejects the submission", async () => {
+    const consoleErrorSpy = spyOn(console, "error").mockImplementation(() => {});
     globalThis.fetch = mock(async () =>
       jsonError({ ok: false, error: "verification" }),
     ) as unknown as typeof fetch;
@@ -171,9 +175,12 @@ describe("ContactForm", () => {
     await waitFor(() => expect(screen.getByRole("alert")).toBeTruthy());
     expect(screen.getByPlaceholderText("Name")).toBeTruthy();
     expect(reset.mock.calls.length).toBe(1);
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+    consoleErrorSpy.mockRestore();
   });
 
   it("shows an error message when the network request fails", async () => {
+    const consoleErrorSpy = spyOn(console, "error").mockImplementation(() => {});
     globalThis.fetch = mock(() => Promise.reject(new Error("network down"))) as unknown as typeof fetch;
 
     render(<ContactForm turnstileSiteKey={TEST_KEY} />);
@@ -181,6 +188,10 @@ describe("ContactForm", () => {
     submitForm();
 
     await waitFor(() => expect(screen.getByRole("alert")).toBeTruthy());
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+    const loggedText = consoleErrorSpy.mock.calls.flat().map(String).join(" ");
+    expect(loggedText).toContain("network down");
+    consoleErrorSpy.mockRestore();
   });
 
   it("disables the submit button and shows 'Sending...' while the request is in flight", async () => {

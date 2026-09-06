@@ -1,4 +1,4 @@
-import { describe, it, expect } from "bun:test";
+import { describe, it, expect, spyOn } from "bun:test";
 import {
   handleContact,
   onRequestPost,
@@ -7,7 +7,7 @@ import {
   TURNSTILE_VERIFY_URL,
   type ContactEnv,
   type FetchLike,
-} from "../contact";
+} from "../../../functions/api/contact";
 
 const ENDPOINT = "https://platcox.com/api/contact";
 
@@ -34,10 +34,12 @@ function envMissing(key: keyof ContactEnv, value: string | undefined): ContactEn
   return env as ContactEnv;
 }
 
+// contact_ref: gerçek tarayıcının her zaman gönderdiği (boş) bal küpü değeri; "yok" senaryosu değil.
 const validFields: Record<string, string> = {
   name: "Ada Lovelace",
   email: "ada@example.test",
   message: "We would like to discuss a project.",
+  contact_ref: "",
   "cf-turnstile-response": "turnstile-token",
 };
 
@@ -75,7 +77,10 @@ function createFakeFetch(routes: Record<string, () => Response> = {}) {
 }
 
 const turnstileSuccess = () => new Response(JSON.stringify({ success: true }), { status: 200 });
-const turnstileFailure = () => new Response(JSON.stringify({ success: false }), { status: 200 });
+const turnstileFailure = () =>
+  new Response(JSON.stringify({ success: false, "error-codes": ["invalid-input-response"] }), {
+    status: 200,
+  });
 const resendAccepted = () => new Response(JSON.stringify({ id: "sent-id" }), { status: 200 });
 
 // Ağ seviyesinde başarısız çağrı: fetch hiç yanıt üretmeden reject eder.
@@ -161,11 +166,11 @@ describe("handleContact field validation", () => {
 });
 
 describe("handleContact honeypot", () => {
-  it("returns 200 ok and makes no external call when company is filled", async () => {
+  it("returns 200 ok and makes no external call when contact_ref is filled", async () => {
     const { fetchImpl, calls } = createFakeFetch(happyRoutes());
 
     const response = await handleContact(
-      makeRequest({ ...validFields, company: "Acme" }),
+      makeRequest({ ...validFields, contact_ref: "Acme" }),
       validEnv(),
       fetchImpl,
     );
@@ -175,11 +180,11 @@ describe("handleContact honeypot", () => {
     expect(calls).toHaveLength(0);
   });
 
-  it("treats a whitespace-only company as filled and makes no external call", async () => {
+  it("treats a whitespace-only contact_ref as filled and makes no external call", async () => {
     const { fetchImpl, calls } = createFakeFetch(happyRoutes());
 
     const response = await handleContact(
-      makeRequest({ ...validFields, company: "   " }),
+      makeRequest({ ...validFields, contact_ref: "   " }),
       validEnv(),
       fetchImpl,
     );
@@ -187,11 +192,26 @@ describe("handleContact honeypot", () => {
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({ ok: true });
     expect(calls).toHaveLength(0);
+  });
+
+  it("treats an empty contact_ref (the shape a real browser sends) as not a bot and reaches Turnstile and Resend", async () => {
+    const { fetchImpl, calls } = createFakeFetch(happyRoutes());
+
+    const response = await handleContact(
+      makeRequest({ ...validFields, contact_ref: "" }),
+      validEnv(),
+      fetchImpl,
+    );
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ ok: true });
+    expect(calls.map((call) => call.url)).toEqual([TURNSTILE_VERIFY_URL, RESEND_EMAILS_URL]);
   });
 });
 
 describe("handleContact turnstile verification", () => {
-  it("returns 400 verification for an empty token without calling siteverify", async () => {
+  it("returns 400 verification for an empty token without calling siteverify or logging", async () => {
+    const consoleErrorSpy = spyOn(console, "error").mockImplementation(() => {});
     const { fetchImpl, calls } = createFakeFetch(happyRoutes());
 
     const response = await handleContact(
@@ -203,9 +223,12 @@ describe("handleContact turnstile verification", () => {
     expect(response.status).toBe(400);
     expect(await response.json()).toEqual({ ok: false, error: "verification" });
     expect(calls).toHaveLength(0);
+    expect(consoleErrorSpy).not.toHaveBeenCalled();
+    consoleErrorSpy.mockRestore();
   });
 
-  it("returns 400 verification when siteverify reports failure and never calls Resend", async () => {
+  it("returns 400 verification when siteverify reports failure, logs the error codes, and never calls Resend", async () => {
+    const consoleErrorSpy = spyOn(console, "error").mockImplementation(() => {});
     const { fetchImpl, calls } = createFakeFetch({
       [TURNSTILE_VERIFY_URL]: turnstileFailure,
       [RESEND_EMAILS_URL]: resendAccepted,
@@ -229,9 +252,15 @@ describe("handleContact turnstile verification", () => {
     expect(params.get("secret")).toBe(env.TURNSTILE_SECRET_KEY);
     expect(params.get("response")).toBe(validFields["cf-turnstile-response"] as string);
     expect(params.get("remoteip")).toBe("203.0.113.7");
+
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+    const loggedArgs = consoleErrorSpy.mock.calls[0]?.map((arg) => JSON.stringify(arg)).join(" ");
+    expect(loggedArgs).toContain("invalid-input-response");
+    consoleErrorSpy.mockRestore();
   });
 
-  it("returns 400 verification when siteverify responds with a non-ok status", async () => {
+  it("returns 400 verification and logs the status when siteverify responds with a non-ok status", async () => {
+    const consoleErrorSpy = spyOn(console, "error").mockImplementation(() => {});
     const { fetchImpl, calls } = createFakeFetch({
       [TURNSTILE_VERIFY_URL]: () => new Response("", { status: 500 }),
       [RESEND_EMAILS_URL]: resendAccepted,
@@ -242,9 +271,14 @@ describe("handleContact turnstile verification", () => {
     expect(response.status).toBe(400);
     expect(await response.json()).toEqual({ ok: false, error: "verification" });
     expect(calls.map((call) => call.url)).toEqual([TURNSTILE_VERIFY_URL]);
+
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+    expect(String(consoleErrorSpy.mock.calls[0]?.[0])).toContain("500");
+    consoleErrorSpy.mockRestore();
   });
 
-  it("returns 400 verification when siteverify returns malformed JSON", async () => {
+  it("returns 400 verification and logs an error when siteverify returns malformed JSON", async () => {
+    const consoleErrorSpy = spyOn(console, "error").mockImplementation(() => {});
     const { fetchImpl, calls } = createFakeFetch({
       [TURNSTILE_VERIFY_URL]: () => new Response("not json", { status: 200 }),
       [RESEND_EMAILS_URL]: resendAccepted,
@@ -255,9 +289,12 @@ describe("handleContact turnstile verification", () => {
     expect(response.status).toBe(400);
     expect(await response.json()).toEqual({ ok: false, error: "verification" });
     expect(calls.map((call) => call.url)).toEqual([TURNSTILE_VERIFY_URL]);
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+    consoleErrorSpy.mockRestore();
   });
 
-  it("returns 400 verification when the siteverify request fails at the network level", async () => {
+  it("returns 400 verification and logs the network error when the siteverify request fails at the network level", async () => {
+    const consoleErrorSpy = spyOn(console, "error").mockImplementation(() => {});
     const { fetchImpl, calls } = createFakeFetch({
       [TURNSTILE_VERIFY_URL]: networkFailure,
       [RESEND_EMAILS_URL]: resendAccepted,
@@ -268,14 +305,18 @@ describe("handleContact turnstile verification", () => {
     expect(response.status).toBe(400);
     expect(await response.json()).toEqual({ ok: false, error: "verification" });
     expect(calls.map((call) => call.url)).toEqual([TURNSTILE_VERIFY_URL]);
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+    expect(String(consoleErrorSpy.mock.calls[0]?.[0])).toContain("network request failed");
+    consoleErrorSpy.mockRestore();
   });
 });
 
 describe("handleContact delivery", () => {
-  it("returns 502 send when Resend rejects the message", async () => {
+  it("returns 502 send and logs the status and truncated body when Resend rejects the message", async () => {
+    const consoleErrorSpy = spyOn(console, "error").mockImplementation(() => {});
     const { fetchImpl, calls } = createFakeFetch({
       [TURNSTILE_VERIFY_URL]: turnstileSuccess,
-      [RESEND_EMAILS_URL]: () => new Response("", { status: 403 }),
+      [RESEND_EMAILS_URL]: () => new Response("forbidden sender domain", { status: 403 }),
     });
 
     const response = await handleContact(makeRequest(validFields), validEnv(), fetchImpl);
@@ -283,9 +324,32 @@ describe("handleContact delivery", () => {
     expect(response.status).toBe(502);
     expect(await response.json()).toEqual({ ok: false, error: "send" });
     expect(calls.map((call) => call.url)).toEqual([TURNSTILE_VERIFY_URL, RESEND_EMAILS_URL]);
+
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+    const logged = String(consoleErrorSpy.mock.calls[0]?.[0]);
+    expect(logged).toContain("403");
+    expect(logged).toContain("forbidden sender domain");
+    consoleErrorSpy.mockRestore();
   });
 
-  it("returns 502 send when the Resend request fails at the network level", async () => {
+  it("truncates a long Resend error body to 500 characters in the log", async () => {
+    const consoleErrorSpy = spyOn(console, "error").mockImplementation(() => {});
+    const longBody = "x".repeat(600);
+    const { fetchImpl } = createFakeFetch({
+      [TURNSTILE_VERIFY_URL]: turnstileSuccess,
+      [RESEND_EMAILS_URL]: () => new Response(longBody, { status: 500 }),
+    });
+
+    await handleContact(makeRequest(validFields), validEnv(), fetchImpl);
+
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+    const logged = String(consoleErrorSpy.mock.calls[0]?.[0]);
+    expect(logged).not.toContain("x".repeat(501));
+    consoleErrorSpy.mockRestore();
+  });
+
+  it("returns 502 send and logs the network error when the Resend request fails at the network level", async () => {
+    const consoleErrorSpy = spyOn(console, "error").mockImplementation(() => {});
     const { fetchImpl, calls } = createFakeFetch({
       [TURNSTILE_VERIFY_URL]: turnstileSuccess,
       [RESEND_EMAILS_URL]: networkFailure,
@@ -296,6 +360,26 @@ describe("handleContact delivery", () => {
     expect(response.status).toBe(502);
     expect(await response.json()).toEqual({ ok: false, error: "send" });
     expect(calls.map((call) => call.url)).toEqual([TURNSTILE_VERIFY_URL, RESEND_EMAILS_URL]);
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+    expect(String(consoleErrorSpy.mock.calls[0]?.[0])).toContain("network request failed");
+    consoleErrorSpy.mockRestore();
+  });
+
+  it("never logs the Authorization header, the Resend key, or the request body on failure", async () => {
+    const consoleErrorSpy = spyOn(console, "error").mockImplementation(() => {});
+    const env = validEnv();
+    const { fetchImpl } = createFakeFetch({
+      [TURNSTILE_VERIFY_URL]: turnstileSuccess,
+      [RESEND_EMAILS_URL]: () => new Response("nope", { status: 403 }),
+    });
+
+    await handleContact(makeRequest(validFields), env, fetchImpl);
+
+    const loggedText = consoleErrorSpy.mock.calls.flat().map(String).join(" ");
+    expect(loggedText).not.toContain(env.RESEND_API_KEY);
+    expect(loggedText).not.toContain(env.TURNSTILE_SECRET_KEY);
+    expect(loggedText).not.toContain("Bearer");
+    consoleErrorSpy.mockRestore();
   });
 
   it("returns 200 ok and sends a plain-text Resend payload on the happy path", async () => {
@@ -327,6 +411,22 @@ describe("handleContact delivery", () => {
     expect(String(payload.text)).toContain(validFields.email as string);
     expect(String(payload.text)).toContain(validFields.message as string);
     expect("html" in payload).toBe(false);
+  });
+
+  it("collapses CR/LF in the name for the subject only, keeping the original name in the text body", async () => {
+    const { fetchImpl, calls } = createFakeFetch(happyRoutes());
+    const fields = { ...validFields, name: "Ada\r\nBcc: x@y.test" };
+
+    const response = await handleContact(makeRequest(fields), validEnv(), fetchImpl);
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ ok: true });
+
+    const resendCall = calls[1];
+    const payload = JSON.parse(String(callBody(resendCall))) as Record<string, unknown>;
+    expect(payload.subject).toBe("Website inquiry from Ada Bcc: x@y.test");
+    expect(String(payload.subject)).not.toMatch(/[\r\n]/);
+    expect(String(payload.text)).toContain("Ada\r\nBcc: x@y.test");
   });
 });
 

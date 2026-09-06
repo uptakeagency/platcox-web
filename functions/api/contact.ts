@@ -65,10 +65,20 @@ async function isTurnstileVerified(
 ): Promise<boolean> {
   try {
     const response = await fetchImpl(TURNSTILE_VERIFY_URL, { method: "POST", body });
-    if (!response.ok) return false;
-    const result = (await response.json()) as { success?: unknown };
-    return result.success === true;
-  } catch {
+    if (!response.ok) {
+      console.error(`Turnstile siteverify request failed: ${response.status}`);
+      return false;
+    }
+    const result = (await response.json()) as { success?: unknown; "error-codes"?: unknown };
+    if (result.success !== true) {
+      if (result["error-codes"]) {
+        console.error("Turnstile verification failed", result["error-codes"]);
+      }
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error(`Turnstile siteverify error: ${err instanceof Error ? err.message : String(err)}`);
     return false;
   }
 }
@@ -77,8 +87,14 @@ async function isTurnstileVerified(
 async function isDelivered(fetchImpl: FetchLike, init: RequestInit): Promise<boolean> {
   try {
     const response = await fetchImpl(RESEND_EMAILS_URL, init);
-    return response.ok;
-  } catch {
+    if (!response.ok) {
+      const bodyText = (await response.text()).slice(0, 500);
+      console.error(`Resend delivery failed: ${response.status} ${bodyText}`);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error(`Resend delivery error: ${err instanceof Error ? err.message : String(err)}`);
     return false;
   }
 }
@@ -100,11 +116,11 @@ export async function handleContact(
   const name = fieldValue(form, "name").trim();
   const email = fieldValue(form, "email").trim();
   const message = fieldValue(form, "message").trim();
-  const company = fieldValue(form, "company");
+  const contactRef = fieldValue(form, "contact_ref");
   const token = fieldValue(form, "cf-turnstile-response");
 
   // Bal küpü dolduysa bot'a başarı göster, hiçbir dış çağrı yapma.
-  if (company !== "") return jsonResponse(200, { ok: true });
+  if (contactRef !== "") return jsonResponse(200, { ok: true });
 
   if (!isValidSubmission(name, email, message)) {
     return jsonResponse(400, { ok: false, error: "invalid" });
@@ -123,6 +139,9 @@ export async function handleContact(
     return jsonResponse(400, { ok: false, error: "verification" });
   }
 
+  // Konu satırında CR/LF header enjeksiyonuna kapı bırakmamak için ad tek satıra sıkıştırılır.
+  const subjectName = name.replace(/\s+/g, " ");
+
   // Yalnızca düz metin gönderilir; HTML enjeksiyonu yüzeyi yok.
   const delivered = await isDelivered(fetchImpl, {
     method: "POST",
@@ -134,7 +153,7 @@ export async function handleContact(
       from: env.CONTACT_FROM,
       to: [env.CONTACT_TO],
       reply_to: email,
-      subject: `Website inquiry from ${name}`,
+      subject: `Website inquiry from ${subjectName}`,
       text: `Name: ${name}\nEmail: ${email}\n\n${message}`,
     }),
   });

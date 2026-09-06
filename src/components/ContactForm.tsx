@@ -39,10 +39,12 @@ export default function ContactForm({ turnstileSiteKey }: { turnstileSiteKey: st
       if (res.ok && data?.ok === true) {
         setStatus("sent");
       } else {
+        console.error("contact form submit failed", res.status);
         setStatus("error");
         window.turnstile?.reset?.();
       }
-    } catch {
+    } catch (err) {
+      console.error("contact form submit failed", err);
       setStatus("error");
       window.turnstile?.reset?.();
     }
@@ -89,7 +91,7 @@ export default function ContactForm({ turnstileSiteKey }: { turnstileSiteKey: st
         {/* Bal küpü: botlar dolduracak, insanlar görmeyecek */}
         <input
           type="text"
-          name="company"
+          name="contact_ref"
           tabIndex={-1}
           autoComplete="off"
           aria-hidden="true"
