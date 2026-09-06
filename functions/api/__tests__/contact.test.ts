@@ -78,6 +78,11 @@ const turnstileSuccess = () => new Response(JSON.stringify({ success: true }), {
 const turnstileFailure = () => new Response(JSON.stringify({ success: false }), { status: 200 });
 const resendAccepted = () => new Response(JSON.stringify({ id: "sent-id" }), { status: 200 });
 
+// Ağ seviyesinde başarısız çağrı: fetch hiç yanıt üretmeden reject eder.
+const networkFailure = (): Response => {
+  throw new TypeError("network request failed");
+};
+
 function happyRoutes(): Record<string, () => Response> {
   return { [TURNSTILE_VERIFY_URL]: turnstileSuccess, [RESEND_EMAILS_URL]: resendAccepted };
 }
@@ -169,6 +174,20 @@ describe("handleContact honeypot", () => {
     expect(await response.json()).toEqual({ ok: true });
     expect(calls).toHaveLength(0);
   });
+
+  it("treats a whitespace-only company as filled and makes no external call", async () => {
+    const { fetchImpl, calls } = createFakeFetch(happyRoutes());
+
+    const response = await handleContact(
+      makeRequest({ ...validFields, company: "   " }),
+      validEnv(),
+      fetchImpl,
+    );
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ ok: true });
+    expect(calls).toHaveLength(0);
+  });
 });
 
 describe("handleContact turnstile verification", () => {
@@ -237,6 +256,19 @@ describe("handleContact turnstile verification", () => {
     expect(await response.json()).toEqual({ ok: false, error: "verification" });
     expect(calls.map((call) => call.url)).toEqual([TURNSTILE_VERIFY_URL]);
   });
+
+  it("returns 400 verification when the siteverify request fails at the network level", async () => {
+    const { fetchImpl, calls } = createFakeFetch({
+      [TURNSTILE_VERIFY_URL]: networkFailure,
+      [RESEND_EMAILS_URL]: resendAccepted,
+    });
+
+    const response = await handleContact(makeRequest(validFields), validEnv(), fetchImpl);
+
+    expect(response.status).toBe(400);
+    expect(await response.json()).toEqual({ ok: false, error: "verification" });
+    expect(calls.map((call) => call.url)).toEqual([TURNSTILE_VERIFY_URL]);
+  });
 });
 
 describe("handleContact delivery", () => {
@@ -244,6 +276,19 @@ describe("handleContact delivery", () => {
     const { fetchImpl, calls } = createFakeFetch({
       [TURNSTILE_VERIFY_URL]: turnstileSuccess,
       [RESEND_EMAILS_URL]: () => new Response("", { status: 403 }),
+    });
+
+    const response = await handleContact(makeRequest(validFields), validEnv(), fetchImpl);
+
+    expect(response.status).toBe(502);
+    expect(await response.json()).toEqual({ ok: false, error: "send" });
+    expect(calls.map((call) => call.url)).toEqual([TURNSTILE_VERIFY_URL, RESEND_EMAILS_URL]);
+  });
+
+  it("returns 502 send when the Resend request fails at the network level", async () => {
+    const { fetchImpl, calls } = createFakeFetch({
+      [TURNSTILE_VERIFY_URL]: turnstileSuccess,
+      [RESEND_EMAILS_URL]: networkFailure,
     });
 
     const response = await handleContact(makeRequest(validFields), validEnv(), fetchImpl);

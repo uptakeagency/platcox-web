@@ -58,15 +58,26 @@ function isValidSubmission(name: string, email: string, message: string): boolea
   );
 }
 
+// Tamamlanamayan çağrı (DNS, bağlantı, timeout) doğrulanmış çağrı değildir.
 async function isTurnstileVerified(
   fetchImpl: FetchLike,
   body: URLSearchParams,
 ): Promise<boolean> {
-  const response = await fetchImpl(TURNSTILE_VERIFY_URL, { method: "POST", body });
-  if (!response.ok) return false;
   try {
+    const response = await fetchImpl(TURNSTILE_VERIFY_URL, { method: "POST", body });
+    if (!response.ok) return false;
     const result = (await response.json()) as { success?: unknown };
     return result.success === true;
+  } catch {
+    return false;
+  }
+}
+
+// Ağ hatası da "gönderilemedi" sayılır; JSON sözleşmesi 502'de kalır.
+async function isDelivered(fetchImpl: FetchLike, init: RequestInit): Promise<boolean> {
+  try {
+    const response = await fetchImpl(RESEND_EMAILS_URL, init);
+    return response.ok;
   } catch {
     return false;
   }
@@ -113,7 +124,7 @@ export async function handleContact(
   }
 
   // Yalnızca düz metin gönderilir; HTML enjeksiyonu yüzeyi yok.
-  const sent = await fetchImpl(RESEND_EMAILS_URL, {
+  const delivered = await isDelivered(fetchImpl, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${env.RESEND_API_KEY}`,
@@ -128,7 +139,7 @@ export async function handleContact(
     }),
   });
 
-  if (!sent.ok) return jsonResponse(502, { ok: false, error: "send" });
+  if (!delivered) return jsonResponse(502, { ok: false, error: "send" });
 
   return jsonResponse(200, { ok: true });
 }
