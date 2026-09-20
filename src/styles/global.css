@@ -93,10 +93,11 @@
     justify-content: center;
   }
 
-  /* İçeriği bir ekrandan uzun bölümler (clients): ortalamak üstte boşluk +
+  /* İçeriği bir ekrandan uzun bölümler (clients, locations): ortalamak üstte boşluk +
      altta kesim yaratıyor → üste hizala + padding'i kıs. İçerik header'ın hemen
      altından başlar (üst boşluk gider); kalan alt kısmı pager intra-step ile gezer. */
-  main > section#clients {
+  main > section#clients,
+  main > section#locations {
     justify-content: flex-start;
     padding-top: 2rem;
     padding-bottom: 2rem;
