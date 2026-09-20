@@ -17,4 +17,11 @@ describe("WorldMap", () => {
     const routes = container.querySelectorAll("[data-motion-reduced-end-state]");
     expect(routes.length).toBe(OFFICES.length - 1);
   });
+
+  it("dekoratif nabız halkası hover hedefi değil (yakın pinler karışmasın)", () => {
+    const { container } = render(<WorldMap />);
+    const pulses = container.querySelectorAll(".animate-pulse");
+    expect(pulses.length).toBe(OFFICES.length);
+    for (const p of pulses) expect(p.className).toContain("pointer-events-none");
+  });
 });

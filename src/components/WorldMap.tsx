@@ -151,7 +151,9 @@ export default function WorldMap() {
           onMouseEnter={() => setActive(loc.id)}
           onMouseLeave={() => setActive(null)}
         >
-          <div className="absolute -inset-3 rounded-full bg-[#22C55E]/20 animate-pulse" />
+          {/* Nabız halkası dekoratif: hover hedefi 12px çekirdek (yakın pinlerde
+              36px halkalar üst üste binip tooltip'i karıştırıyordu — Codex P2). */}
+          <div className="pointer-events-none absolute -inset-3 rounded-full bg-[#22C55E]/20 animate-pulse" />
           <div className="relative h-3 w-3 rounded-full bg-[#22C55E] cursor-pointer" />
 
           {/* Kalıcı şehir etiketi (hover'da tooltip country+type ekler). Dar ekranda
