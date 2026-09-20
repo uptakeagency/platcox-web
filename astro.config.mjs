@@ -1,4 +1,4 @@
-import { defineConfig } from "astro/config";
+import { defineConfig, envField } from "astro/config";
 import react from "@astrojs/react";
 import sitemap from "@astrojs/sitemap";
 import tailwind from "@astrojs/tailwind";
@@ -15,4 +15,10 @@ export default defineConfig({
       filter: (page) => new URL(page).pathname !== "/motion-playground/",
     }),
   ],
+  env: {
+    schema: {
+      // Turnstile site anahtarı public'tir; build'de gömülür. Eksikse build düşer (fallback yok).
+      PUBLIC_TURNSTILE_SITE_KEY: envField.string({ context: "client", access: "public" }),
+    },
+  },
 });

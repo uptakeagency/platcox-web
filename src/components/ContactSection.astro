@@ -2,6 +2,7 @@
 import ScrollReveal from "./motion/ScrollReveal";
 import ContactForm from "./ContactForm.tsx";
 import { LINKEDIN_URL } from "../lib/siteLinks";
+import { PUBLIC_TURNSTILE_SITE_KEY } from "astro:env/client";
 ---
 
 <section id="contact" class="section-padding">
@@ -18,7 +19,7 @@ import { LINKEDIN_URL } from "../lib/siteLinks";
 
     <div class="mt-20 grid gap-16 md:grid-cols-2">
       <ScrollReveal client:idle animation="fade-up" delay={200}>
-        <ContactForm client:visible />
+        <ContactForm client:visible turnstileSiteKey={PUBLIC_TURNSTILE_SITE_KEY} />
       </ScrollReveal>
 
       <ScrollReveal client:idle animation="fade-in" delay={300}>
