@@ -63,7 +63,13 @@ export function nextTarget(s: PagerState): PagerTarget | null {
       return null;
     } else {
       index = i - 1;
-      target = alignedTop(s, index);
+      const prev = s.sections[index];
+      const prevTall = prev.height > s.viewport - s.headerOffset + EDGE;
+      // Uzun önceki bölüme ALT kenarından gir: tepesinden girilirse bir sonraki
+      // up "tepedeyim" sayıp komşuya atlar → alt kısım geri yönde erişilemez kalır.
+      target = prevTall
+        ? Math.max(prev.top + prev.height - s.viewport, alignedTop(s, index))
+        : alignedTop(s, index);
     }
   }
 

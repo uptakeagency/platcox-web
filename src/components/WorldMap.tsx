@@ -1,43 +1,25 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { WORLD_DOTS } from "../lib/worldDots";
+import { HQ, OFFICES, displayPosition, type Office } from "../lib/offices";
 
-interface Location {
-  id: string;
-  city: string;
-  country: string;
-  type: string;
-  x: number;
-  y: number;
-}
+// Pinler tek kaynaktan (offices.ts); koordinatlar enlem/boylamdan türetilir
+// (+ yakın pinler için küçük gösterim kaydırması; rota ucu da pinle aynı yerde).
+const locations = OFFICES.map((o) => ({ ...o, ...displayPosition(o) }));
 
-const locations: Location[] = [
-  { id: "istanbul", city: "Istanbul", country: "Turkey", type: "HQ", x: 55, y: 32 },
-  { id: "london", city: "London", country: "UK", type: "Office", x: 47, y: 25 },
-  { id: "mumbai", city: "Mumbai", country: "India", type: "Partner", x: 66, y: 48 },
-  { id: "dhaka", city: "Dhaka", country: "Bangladesh", type: "Sourcing", x: 70, y: 44 },
-  { id: "shanghai", city: "Shanghai", country: "China", type: "Sourcing", x: 78, y: 36 },
-  { id: "newyork", city: "New York", country: "USA", type: "Office", x: 25, y: 30 },
-  { id: "dubai", city: "Dubai", country: "UAE", type: "Partner", x: 60, y: 42 },
-  { id: "nairobi", city: "Nairobi", country: "Kenya", type: "Partner", x: 57, y: 55 },
-  { id: "saopaulo", city: "São Paulo", country: "Brazil", type: "Partner", x: 30, y: 62 },
-];
-
-// HQ-merkezli ticaret rotaları (Phase 6 Task 6.2 — TradeRoute integration).
-// Inline SMIL pattern: TradeRoute primitive'inin scaled versiyonu, WorldMap
-// SVG viewBox'ına (1000x500) absolute koordinatlarla çiziliyor.
-const routes: Array<{ from: string; to: string }> = [
-  { from: "istanbul", to: "london" },
-  { from: "istanbul", to: "newyork" },
-  { from: "istanbul", to: "shanghai" },
-  { from: "istanbul", to: "mumbai" },
-  { from: "istanbul", to: "dubai" },
-  { from: "istanbul", to: "dhaka" },
-  { from: "istanbul", to: "nairobi" },
-  { from: "istanbul", to: "saopaulo" },
-];
+// Merkezden diğer her ofise bir ticaret rotası (TradeRoute paterni, inline SMIL;
+// WorldMap SVG viewBox'ına (1000x500) absolute koordinatlarla çiziliyor).
+const routes = locations.filter((l) => l.id !== HQ.id).map((l) => ({ from: HQ.id, to: l.id }));
 
 const locationsById = new Map(locations.map((l) => [l.id, l]));
+
+// Etiket yönü → konum sınıfları (yakın pinlerde çakışmayı önler).
+const LABEL_SIDE: Record<NonNullable<Office["labelSide"]>, string> = {
+  bottom: "left-1/2 top-full mt-1.5 -translate-x-1/2",
+  top: "left-1/2 bottom-full mb-1.5 -translate-x-1/2",
+  right: "left-full top-1/2 ml-2.5 -translate-y-1/2",
+  left: "right-full top-1/2 mr-2.5 -translate-y-1/2",
+};
 
 export default function WorldMap() {
   const [active, setActive] = useState<string | null>(null);
@@ -96,8 +78,8 @@ export default function WorldMap() {
             noktalarla çizilir; kenarlarda radial fade. Rotalar + şehir node'ları üstüne biner. */}
         <defs>
           <radialGradient id="wm-fade" cx="50%" cy="50%" r="80%">
-            <stop offset="0%" stop-color="white" stop-opacity="1" />
-            <stop offset="100%" stop-color="white" stop-opacity="0.65" />
+            <stop offset="0%" stopColor="white" stopOpacity="1" />
+            <stop offset="100%" stopColor="white" stopOpacity="0.65" />
           </radialGradient>
           <mask id="wm-mask">
             <rect width="1000" height="500" fill="url(#wm-fade)" />
@@ -169,11 +151,17 @@ export default function WorldMap() {
           onMouseEnter={() => setActive(loc.id)}
           onMouseLeave={() => setActive(null)}
         >
-          <div className="absolute -inset-3 rounded-full bg-[#22C55E]/20 animate-pulse" />
+          {/* Nabız halkası dekoratif: hover hedefi 12px çekirdek (yakın pinlerde
+              36px halkalar üst üste binip tooltip'i karıştırıyordu — Codex P2). */}
+          <div className="pointer-events-none absolute -inset-3 rounded-full bg-[#22C55E]/20 animate-pulse" />
           <div className="relative h-3 w-3 rounded-full bg-[#22C55E] cursor-pointer" />
 
-          {/* Kalıcı şehir etiketi (hover'da tooltip country+type ekler) */}
-          <span className="pointer-events-none absolute left-1/2 top-full mt-1.5 -translate-x-1/2 whitespace-nowrap text-[10px] font-medium tracking-wide text-[#1A1A1A]/75">
+          {/* Kalıcı şehir etiketi (hover'da tooltip country+type ekler). Dar ekranda
+              Avrupa pinleri sıkışıp etiketler üst üste biniyor → sm altında gizli;
+              şehirler harita altındaki adres kartlarında zaten listeli. */}
+          <span
+            className={`pointer-events-none absolute hidden sm:block whitespace-nowrap text-[10px] font-medium tracking-wide text-[#1A1A1A]/75 ${LABEL_SIDE[loc.labelSide ?? "bottom"]}`}
+          >
             {loc.city}
           </span>
 
@@ -186,7 +174,7 @@ export default function WorldMap() {
                 className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 whitespace-nowrap bg-white px-4 py-2 shadow-lg"
               >
                 <p className="text-sm font-medium text-[#1A1A1A]">{loc.city}</p>
-                <p className="text-xs text-[#999]">{loc.country} &middot; {loc.type}</p>
+                <p className="text-xs text-[#999]">{loc.country} &middot; {loc.type === "HQ" ? "Headquarters" : "Office"}</p>
                 <div className="absolute left-1/2 top-full -translate-x-1/2 border-4 border-transparent border-t-white" />
               </motion.div>
             )}
