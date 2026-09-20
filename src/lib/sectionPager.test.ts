@@ -35,8 +35,27 @@ test("ilk bölümde up → null", () => {
   expect(nextTarget({ ...base, scrollY: 0, direction: -1 })).toBeNull();
 });
 
-test("kısa bölümde (hizalı) up → önceki bölüm", () => {
-  expect(nextTarget({ ...base, scrollY: 2120, direction: -1 })).toEqual({ scrollTo: 520, index: 1 });
+test("kısa bölümde up → önceki UZUN bölüme ALT kenarından girer", () => {
+  // section1 uzun (1600 > 720). Tepesinden girilirse (520) bir sonraki up
+  // "tepedeyim" deyip section0'a atlar → alt satırlar geri yönde hiç görünmez
+  // (Codex P1). Alt kenar: bottom - viewport = 2200 - 800 = 1400.
+  expect(nextTarget({ ...base, scrollY: 2120, direction: -1 })).toEqual({ scrollTo: 1400, index: 1 });
+});
+
+test("uzun bölüme alttan girdikten sonra up → iç-adımlarla tepeye", () => {
+  const r = nextTarget({ ...base, scrollY: 1400, direction: -1 });
+  expect(r?.index).toBe(1);
+  expect(r?.scrollTo).toBe(Math.max(1400 - 800 * 0.85, 520)); // 720
+});
+
+test("kısa bölümde up → önceki KISA bölümün hizalı tepesi", () => {
+  const T = [
+    { top: 0, height: 700 },
+    { top: 700, height: 700 },
+    { top: 1400, height: 700 },
+  ];
+  expect(nextTarget({ viewport: 800, headerOffset: 80, sections: T, scrollY: 1320, direction: -1 }))
+    .toEqual({ scrollTo: 620, index: 1 });
 });
 
 test("uzun bölümde içerideyken up → iç-yukarı adım (komşuya atlamaz)", () => {

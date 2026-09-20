@@ -1,5 +1,5 @@
 import { describe, it, expect } from "bun:test";
-import { OFFICES, projectToMap } from "../offices";
+import { OFFICES, projectToMap, displayPosition } from "../offices";
 
 describe("OFFICES", () => {
   it("on bir lokasyon, kimlikler benzersiz", () => {
@@ -55,6 +55,33 @@ describe("projectToMap", () => {
       expect(p.x).toBeLessThan(100);
       expect(p.y).toBeGreaterThan(0);
       expect(p.y).toBeLessThan(100);
+    }
+  });
+});
+
+describe("displayPosition (pin çakışması)", () => {
+  // viewBox 1000x500; pin çekirdeği 12px + pulse halkası 36px → 1400px haritada
+  // ~28 birim altı üst üste biner ve hover hedefleri karışır (Codex P2).
+  it("hiçbir iki pin 28 viewBox biriminden yakın değil", () => {
+    const pts = OFFICES.map((o) => {
+      const p = displayPosition(o);
+      return { id: o.id, x: p.x * 10, y: p.y * 5 };
+    });
+    const tooClose: string[] = [];
+    for (let a = 0; a < pts.length; a++)
+      for (let b = a + 1; b < pts.length; b++) {
+        const d = Math.hypot(pts[a].x - pts[b].x, pts[a].y - pts[b].y);
+        if (d < 28) tooClose.push(`${pts[a].id}-${pts[b].id}:${d.toFixed(1)}`);
+      }
+    expect(tooClose).toEqual([]);
+  });
+
+  it("kaydırma yalnızca gösterim için, küçük ve harita içinde", () => {
+    for (const o of OFFICES) {
+      const t = projectToMap(o);
+      const d = displayPosition(o);
+      expect(Math.abs(d.x - t.x)).toBeLessThanOrEqual(2);
+      expect(Math.abs(d.y - t.y)).toBeLessThanOrEqual(3);
     }
   });
 });

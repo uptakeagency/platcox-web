@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { WORLD_DOTS } from "../lib/worldDots";
-import { HQ, OFFICES, projectToMap, type Office } from "../lib/offices";
+import { HQ, OFFICES, displayPosition, type Office } from "../lib/offices";
 
-// Pinler tek kaynaktan (offices.ts); koordinatlar enlem/boylamdan türetilir.
-const locations = OFFICES.map((o) => ({ ...o, ...projectToMap(o) }));
+// Pinler tek kaynaktan (offices.ts); koordinatlar enlem/boylamdan türetilir
+// (+ yakın pinler için küçük gösterim kaydırması; rota ucu da pinle aynı yerde).
+const locations = OFFICES.map((o) => ({ ...o, ...displayPosition(o) }));
 
 // Merkezden diğer her ofise bir ticaret rotası (TradeRoute paterni, inline SMIL;
 // WorldMap SVG viewBox'ına (1000x500) absolute koordinatlarla çiziliyor).

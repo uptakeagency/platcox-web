@@ -12,6 +12,9 @@ export interface Office {
   lng: number;
   /** Pin etiketi yönü; komşu pinlerle çakışmayı önlemek için (varsayılan: alt). */
   labelSide?: "top" | "bottom" | "left" | "right";
+  /** Yalnızca gösterim için küçük kaydırma (harita yüzdesi): birbirine 5-10px
+      düşen pinler (Guangzhou / Hong Kong / Xiamen) ayrışsın. Gerçek koordinat lat/lng. */
+  nudge?: { x: number; y: number };
 }
 
 export const OFFICES: Office[] = [
@@ -101,6 +104,7 @@ export const OFFICES: Office[] = [
     lines: ["Unit 1501, 15/F, Yue Xiu Building", "160-174 Lockhart Road, Wan Chai"],
     lat: 22.28,
     lng: 114.17,
+    nudge: { x: 0.6, y: 1.5 },
   },
   {
     id: "guangzhou",
@@ -111,6 +115,7 @@ export const OFFICES: Office[] = [
     lat: 23.1,
     lng: 113.46,
     labelSide: "top",
+    nudge: { x: -1.2, y: -2 },
   },
   {
     id: "xiamen",
@@ -121,6 +126,7 @@ export const OFFICES: Office[] = [
     lat: 24.52,
     lng: 118.13,
     labelSide: "right",
+    nudge: { x: 1.2, y: -1.5 },
   },
 ];
 
@@ -139,4 +145,10 @@ export function projectToMap({ lat, lng }: { lat: number; lng: number }): { x: n
   const bottom = mercY(REGION.lat.min);
   const y = ((top - mercY(lat)) / (top - bottom)) * 100;
   return { x, y };
+}
+
+/** Pinin ekrandaki yeri: projeksiyon + (varsa) gösterim kaydırması. */
+export function displayPosition(o: Office): { x: number; y: number } {
+  const p = projectToMap(o);
+  return { x: p.x + (o.nudge?.x ?? 0), y: p.y + (o.nudge?.y ?? 0) };
 }
